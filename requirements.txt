@@ -1,0 +1,26 @@
+# Calcul scientifique
+numpy==1.26.0
+pandas==2.1.0
+
+# Données géospatiales
+rasterio==1.3.9        # lecture du MNT IGN
+pyproj==3.6.1          # conversions de coordonnées
+shapely==2.0.2
+
+# API météo
+httpx==0.25.0          # appels HTTP async
+
+# API backend
+fastapi==0.104.0
+uvicorn==0.24.0
+
+# Astronomie solaire
+pvlib==0.10.3          # calculs position soleil — librairie de référence
+
+# Tests
+pytest==7.4.0
+pytest-asyncio==0.21.0
+
+# Notebooks
+jupyter==1.0.0
+matplotlib==3.8.0

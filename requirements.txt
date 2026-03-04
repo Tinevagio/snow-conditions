@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3a867c355e059835f9808e64cbf2fe6e98f9b36d
 # Calcul scientifique
 numpy==1.26.0
 pandas==2.1.0

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environnement
+.env
+
+# Data
+data/cache/
+*.tif          # fichiers MNT qui peuvent être très lourds
+*.nc           # fichiers NetCDF météo
+
+# Notebooks
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/

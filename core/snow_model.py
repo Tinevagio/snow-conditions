@@ -89,6 +89,7 @@ class HourlyWeather:
     snowfall_last_72h: float            # cm de neige fraîche sur 72h
     hours_above_zero_last_48h: int      # nb d'heures > 0°C sur les 48h passées
     hours_below_minus2_last_12h: int    # nb d'heures < -2°C sur les 12h passées
+    direct_radiation:float              # radiation solaire
 
 
 @dataclass
@@ -214,7 +215,7 @@ def classify_snow_condition(
     if (0 <= temp_surface <= 1.5
             and weather.hours_above_zero_last_48h >= 3
             and fresh_snow < 10
-            and weather.shortwave_radiation > 150):   # soleil réel requis
+            and weather.direct_radiation > 50):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------
@@ -225,7 +226,7 @@ def classify_snow_condition(
     elif temp_surface <= 0:
         return SnowCondition.OLD_PACKED, temp_surface
     else:
-        return SnowCondition.SPRING_SNOW, temp_surface
+        return SnowCondition.WET_HEAVY, temp_surface
 
 
 # ---------------------------------------------------------------------------

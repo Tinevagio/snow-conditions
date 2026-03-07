@@ -10,6 +10,7 @@ import json
 import urllib.request
 import urllib.parse
 from datetime import datetime, timezone, timedelta
+from core.snow_model import HourlyWeather
 from typing import List
 
 try:
@@ -27,9 +28,10 @@ except ImportError:
         snowfall_last_72h: float
         hours_above_zero_last_48h: int
         hours_below_minus2_last_12h: int
+        direct_radiation:float
 
 OPENMETEO_BASE_URL = "https://api.open-meteo.com/v1/forecast"
-VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation", "snowfall"]
+VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation","direct_radiation", "snowfall"]
 PAST_DAYS = 5
 FORECAST_DAYS = 2
 
@@ -111,7 +113,11 @@ def get_hourly_weather(lat, lon, target_date=None) -> List[HourlyWeather]:
             snowfall_last_72h           = s72,
             hours_above_zero_last_48h   = above_zero,
             hours_below_minus2_last_12h = below_minus2,
+            direct_radiation = _safe(hourly["direct_radiation"], idx),
         ))
+    
+    for w in results:
+        print(f"h={w.hour:02d} direct={w.direct_radiation:6.1f} shortwave={w.shortwave_radiation:6.1f}")
     return results
 
 

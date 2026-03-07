@@ -33,7 +33,10 @@ from pydantic import BaseModel, Field
 
 
 import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 
 from core.snow_model import (
     GridPoint,
@@ -132,12 +135,22 @@ class PowderWindow(BaseModel):
 class BestWindowResponse(BaseModel):
     date: str
     bbox: List[float]
-    best_north_facing: List[PowderWindow]
+    points: List[WindowPoint]
 
 class HealthResponse(BaseModel):
     status: str
     version: str
     timestamp: str
+
+class WindowPoint(BaseModel):
+    lat: float
+    lon: float
+    elevation_m: float
+    aspect_deg: float
+    aspect_label: str
+    slope_deg: float
+    powder_until_hour: Optional[int]   # None = pas de poudre
+    spring_optimal_hour: Optional[int] # None = pas de SPRING_SNOW
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -212,6 +225,59 @@ def _group_results_by_point(
 
     return output
 
+def _compute_windows(
+    point: TerrainPoint,
+    weather_series: list,
+    month: int,
+    day: int,
+) -> dict:
+    from core.snow_model import GridPoint, classify_snow_condition
+
+    gp = GridPoint(
+        lat=point.lat, lon=point.lon,
+        elevation=point.elevation_m,
+        aspect=point.aspect_deg,
+        slope=point.slope_deg,
+    )
+
+    # Poudre : séquence continue depuis h=0
+    powder_until = None
+    for w in sorted(weather_series, key=lambda x: x.hour):
+        cond, _ = classify_snow_condition(gp, w, month, day)
+        if cond.name in ('POWDER_COLD', 'POWDER_WARM'):
+            powder_until = w.hour
+        else:
+            break
+
+    # Moquette : heure centrale de toutes les heures SPRING_SNOW
+    spring_hours = []
+    for w in sorted(weather_series, key=lambda x: x.hour):
+        cond, _ = classify_snow_condition(gp, w, month, day)
+        if cond.name == 'SPRING_SNOW' and w.hour <= 20:
+            spring_hours.append(w.hour)
+
+    spring_optimal = None
+    if spring_hours:
+        best_start, best_len = spring_hours[0], 1
+        cur_start, cur_len = spring_hours[0], 1
+        for i in range(1, len(spring_hours)):
+            if spring_hours[i] == spring_hours[i-1] + 1:
+                cur_len += 1
+                if cur_len > best_len:
+                    best_start, best_len = cur_start, cur_len
+            else:
+                cur_start, cur_len = spring_hours[i], 1
+        # Ignorer les fenêtres isolées (< 2h)
+        if best_len >= 2:
+            spring_optimal = best_start + best_len // 2
+    
+    
+    return {
+        "powder_until_hour": powder_until,
+        "spring_optimal_hour": spring_optimal,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -269,12 +335,13 @@ def get_conditions(
     else:
         target_dt = datetime.now(timezone.utc)
 
-    # 1. Grille terrain
+    # 1. Grille terrain avec padding
     try:
         terrain_points = get_terrain_grid(
             lat_min, lon_min, lat_max, lon_max,
             resolution_m=resolution_m,
             tiff_path=tiff_path,
+            padding_m=1000,   # 1km de marge fixe
         )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Erreur terrain : {e}")
@@ -298,7 +365,7 @@ def get_conditions(
     center_lat = (lat_min + lat_max) / 2
     center_lon = (lon_min + lon_max) / 2
     try:
-        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt)
+        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
 
@@ -308,8 +375,12 @@ def get_conditions(
     # 4. Calcul des conditions
     results = compute_snow_conditions(grid, weather, target_dt.month, target_dt.day)
 
-    # 5. Formatage de la réponse
-    points_out = _group_results_by_point(grid, terrain_points, results)
+    # 5.Formatage — on exclut les points de padding de la réponse
+    points_out = _group_results_by_point(
+        [p for p in terrain_points if not p.is_padding],
+        terrain_points,
+        results,
+    )
 
     return ConditionsResponse(
         date=target_dt.strftime("%Y-%m-%d"),
@@ -349,7 +420,7 @@ def get_conditions_point(
     )
 
     try:
-        weather = get_hourly_weather(lat, lon, target_date=target_dt)
+        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
 
@@ -366,22 +437,16 @@ def get_conditions_point(
         hours=hours_out,
     )
 
-
 @app.get("/best-window", response_model=BestWindowResponse, tags=["Conditions"])
 def get_best_window(
-    bbox: str = Query(
-        ...,
-        description="Zone géographique : lat_min,lon_min,lat_max,lon_max",
-        example="45.90,6.85,45.95,6.95",
-    ),
+    bbox: str = Query(..., example="45.90,6.85,45.95,6.95"),
     date: Optional[str] = Query(None, description="Date YYYY-MM-DD (défaut : demain)"),
     resolution_m: float = Query(500, ge=100, le=2000),
 ):
     """
-    Retourne la fenêtre de poudre optimale pour les versants nord de la zone.
-    Killer feature pour planifier le départ la veille au soir.
-
-    Répond à la question : **"Ma poudre tient jusqu'à quelle heure ?"**
+    Retourne pour chaque point de la grille :
+    - powder_until_hour  : dernière heure consécutive de poudre depuis minuit
+    - spring_optimal_hour: heure centrale de la fenêtre neige de printemps
     """
     lat_min, lon_min, lat_max, lon_max = _parse_bbox(bbox)
 
@@ -394,60 +459,42 @@ def get_best_window(
         from datetime import timedelta
         target_dt = datetime.now(timezone.utc) + timedelta(days=1)
 
-    terrain_points = get_terrain_grid(lat_min, lon_min, lat_max, lon_max, resolution_m=resolution_m)
-
-    # On filtre sur les versants nord (aspect 315°–360° ou 0°–45°)
-    north_points = [p for p in terrain_points if p.is_north_facing()]
-
-    if not north_points:
-        raise HTTPException(status_code=404, detail="Aucun versant nord dans cette zone.")
+    terrain_points = get_terrain_grid(
+        lat_min, lon_min, lat_max, lon_max,
+        resolution_m=resolution_m,
+        padding_m=1000,
+    )
 
     center_lat = (lat_min + lat_max) / 2
     center_lon = (lon_min + lon_max) / 2
-
     try:
-        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt)
+        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
 
-    windows = []
-    for p in north_points:
-        # best_powder_window retourne l'heure max où la poudre est encore bonne
-        window_hour = best_powder_window(
+    points_out = []
+    for p in [pt for pt in terrain_points if not pt.is_padding]:
+        w = _compute_windows(p, weather, target_dt.month, target_dt.day)
+        points_out.append(WindowPoint(
             lat=p.lat,
             lon=p.lon,
-            month=target_dt.month,
-            day=target_dt.day,
-            aspect=p.aspect_deg,
-            slope=p.slope_deg,
-        )
-
-        if window_hour is not None:
-            msg = f"Poudre optimale jusqu'à {window_hour:02d}h UTC sur ce versant."
-        else:
-            msg = "Pas de fenêtre poudre identifiée (manteau trop vieux ou conditions défavorables)."
-
-        windows.append(PowderWindow(
-            lat=p.lat,
-            lon=p.lon,
-            aspect_label=p.aspect_label(),
             elevation_m=p.elevation_m,
-            powder_until_hour=window_hour,
-            message=msg,
+            aspect_deg=p.aspect_deg,
+            aspect_label=p.aspect_label(),
+            slope_deg=p.slope_deg,
+            powder_until_hour=w["powder_until_hour"],
+            spring_optimal_hour=w["spring_optimal_hour"],
         ))
-
-    # Trier par heure de fermeture décroissante (meilleures fenêtres en premier)
-    windows.sort(key=lambda w: w.powder_until_hour or -1, reverse=True)
 
     return BestWindowResponse(
         date=target_dt.strftime("%Y-%m-%d"),
         bbox=[lat_min, lon_min, lat_max, lon_max],
-        best_north_facing=windows[:10],  # top 10
+        points=points_out,
     )
-    
+
+
+
 @app.get("/debug/point")
-
-
 def debug_point(lat: float, lon: float, date: str = None,
                 aspect: float = 0, elevation: float = 1500, slope: float = 15):
     target_date = parse_date(date)
@@ -520,17 +567,20 @@ def debug_compare(lat: float, lon: float, date: str = None,
     return result
     
 @app.get("/debug/terrain")
-def debug_terrain(lat: float, lon: float):
-    from data.fetchers.terrain import (
+def debug_terrain(lat: float, lon: float, tiff_path: str = None):
+    from core.terrain import (
         _fetch_from_ign_wcs,
         _estimate_terrain_from_neighbors,
-        _static_estimate,
-        get_terrain_data
+        _extract_from_geotiff,
+        get_terrain_data,
+        RASTERIO_AVAILABLE
     )
-
     return {
+        "rasterio_available": RASTERIO_AVAILABLE,
+        "tiff_path_recu": tiff_path,
+        "geotiff": str(_extract_from_geotiff(tiff_path, lat, lon) if tiff_path else "non fourni"),
         "ign_wcs": str(_fetch_from_ign_wcs(lat, lon)),
         "open_elevation": str(_estimate_terrain_from_neighbors(lat, lon)),
-        "final": str(get_terrain_data(lat, lon))
+        "final": str(get_terrain_data(lat, lon, tiff_path=tiff_path))
     }
     

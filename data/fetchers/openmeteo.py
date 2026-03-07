@@ -30,7 +30,7 @@ except ImportError:
 
 OPENMETEO_BASE_URL = "https://api.open-meteo.com/v1/forecast"
 VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation", "snowfall"]
-PAST_DAYS = 25
+PAST_DAYS = 5
 FORECAST_DAYS = 2
 
 

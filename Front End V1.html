@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Névé — Conditions de neige</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg:     #f4f1ec;
+  --s1:     #edeae3;
+  --s2:     #e5e1d8;
+  --border: #ccc8be;
+  --text:   #2a2520;
+  --muted:  #8c8378;
+  --accent: #2c6e8a;
+  --green:  #3a9e6a;
+  --red:    #c0021a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 11px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.brand { display:flex; align-items:baseline; gap:9px; flex-shrink:0; }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight:700; color: var(--text);
+}
+.brand-sub {
+  color: var(--muted); font-size:9px;
+  letter-spacing:.18em; text-transform:uppercase;
+}
+
+/* API URL — discret */
+.api-url-wrap { display:flex; align-items:center; gap:6px; }
+.api-url-wrap input {
+  background: var(--bg); border:1px solid var(--border);
+  color: var(--text); padding:4px 8px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  border-radius:3px; outline:none; width:220px;
+  transition: border-color .2s;
+}
+.api-url-wrap input:focus { border-color: var(--accent); }
+.api-lbl { color:var(--muted); font-size:10px; letter-spacing:.06em; }
+
+.status { display:flex; align-items:center; gap:7px; margin-left:auto; }
+.dot { width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0; }
+.dot.ok  { background:var(--green); box-shadow:0 0 5px rgba(58,158,106,.4); }
+.dot.err { background:var(--red); }
+.dot.loading { background:var(--accent); animation: pulse .8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.status-txt { color:var(--muted); font-size:11px; }
+
+/* ── TIME BAR ── */
+.time-bar {
+  display:flex; align-items:center; gap:16px;
+  padding:9px 20px;
+  background:var(--s1); border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.time-big {
+  font-family:'Playfair Display',serif;
+  font-size:30px; font-weight:400; font-style:italic;
+  color:var(--accent); min-width:72px; line-height:1;
+}
+.slider-col { flex:1; max-width:520px; }
+input[type=range] {
+  -webkit-appearance:none; width:100%; height:2px;
+  background:var(--border); outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:13px;height:13px;
+  border-radius:50%; background:var(--accent);
+  cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.2);
+  transition:transform .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.3); }
+.hour-ticks {
+  display:flex; justify-content:space-between;
+  margin-top:4px; color:var(--muted); font-size:10px;
+}
+.date-input-wrap { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.date-input-wrap label { color:var(--muted); font-size:10px; letter-spacing:.06em; }
+.date-input-wrap input {
+  background:#fff; border:1px solid var(--border);
+  color:var(--text); padding:4px 8px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  border-radius:3px; outline:none;
+  transition:border-color .2s;
+}
+.date-input-wrap input:focus { border-color:var(--accent); }
+
+/* ── LAYOUT ── */
+.main { display:flex; flex:1; overflow:hidden; }
+
+/* ── MAP ── */
+#map { flex:1; position:relative; }
+
+/* ── DRAW OVERLAY ── */
+.draw-hint {
+  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,.92); border:1px solid var(--border);
+  border-radius:4px; padding:9px 18px;
+  font-size:12px; color:var(--text);
+  pointer-events:none; z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  transition:opacity .3s;
+}
+.draw-hint.hidden { opacity:0; }
+
+.bbox-info {
+  position:absolute; top:12px; left:12px;
+  background:rgba(255,255,255,.94); border:1px solid var(--border);
+  border-radius:4px; padding:10px 14px; z-index:1000;
+  font-size:11px; line-height:1.8;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  display:none;
+}
+.bbox-info.visible { display:block; }
+.bbox-dims { color:var(--accent); font-weight:500; font-size:13px; }
+.bbox-coords { color:var(--muted); font-size:10px; }
+
+.btn-group {
+  position:absolute; top:12px; right:12px;
+  display:flex; flex-direction:column; gap:6px; z-index:1000;
+}
+.map-btn {
+  background:#fff; border:1px solid var(--border);
+  color:var(--text); padding:7px 14px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  letter-spacing:.05em; border-radius:3px;
+  cursor:pointer; transition:border-color .2s,color .2s,background .2s;
+  white-space:nowrap; text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.map-btn:hover { border-color:var(--accent); color:var(--accent); }
+.map-btn.primary { border-color:var(--accent); color:#fff; background:var(--accent); }
+.map-btn.primary:hover { background:#235a73; }
+.map-btn.danger:hover { border-color:var(--red); color:var(--red); }
+.map-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Loader spinner sur carte */
+.map-loader {
+  position:absolute; inset:0; background:rgba(244,241,236,.6);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:12px; z-index:500;
+  display:none;
+}
+.map-loader.visible { display:flex; }
+.spinner {
+  width:32px;height:32px;
+  border:2px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loader-txt { color:var(--muted); font-size:11px; letter-spacing:.1em; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:252px; flex-shrink:0;
+  background:#fff; border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.sb-section { border-bottom:1px solid var(--border); overflow:hidden; }
+.sb-section-body { padding:0 16px 14px; }
+.sb-section.collapsed .sb-section-body { display:none; }
+
+/* Header de section cliquable */
+.sb-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 16px 11px;
+  cursor:pointer; user-select:none;
+  transition:background .15s;
+}
+.sb-header:hover { background:var(--bg); }
+.sb-label {
+  font-size:9px; text-transform:uppercase;
+  letter-spacing:.18em; color:var(--muted);
+  margin:0;
+}
+.sb-chevron {
+  color:var(--muted); font-size:10px;
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.sb-section.collapsed .sb-chevron { transform:rotate(-90deg); }
+
+
+
+
+/* Légende */
+.leg-item {
+  display:flex; align-items:center; gap:8px;
+  padding:3px 3px; cursor:pointer;
+  border-radius:3px; transition:opacity .2s,background .15s;
+}
+.leg-item:hover { background:var(--bg); }
+.leg-item.off { opacity:.3; }
+.leg-swatch {
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(0,0,0,.1);
+}
+.leg-name { flex:1; color:var(--text); font-size:11px; }
+.leg-count { color:var(--muted); font-size:11px; min-width:20px; text-align:right; }
+
+/* Stats */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.stat-box { background:var(--bg); border:1px solid var(--border); border-radius:3px; padding:8px 10px; }
+.stat-val { font-family:'Playfair Display',serif; font-size:17px; color:var(--accent); line-height:1; }
+.stat-lbl { color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
+
+/* Détail */
+.detail { flex:1; overflow-y:auto; padding:14px 16px; }
+.detail::-webkit-scrollbar { width:3px; }
+.detail::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.detail-empty { color:var(--muted); font-size:11px; line-height:1.7; }
+.detail-coords { font-size:10px; color:var(--muted); margin-bottom:10px; letter-spacing:.04em; }
+.cond-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 10px; border-radius:3px;
+  font-size:11px; font-weight:500; margin-bottom:12px;
+}
+.detail-row {
+  display:flex; justify-content:space-between;
+  padding:5px 0; border-bottom:1px solid var(--s1);
+  font-size:11px;
+}
+.dr-lbl { color:var(--muted); }
+.dr-val { color:var(--text); }
+.tl-wrap { margin-top:12px; }
+.tl-row {
+  display:flex; align-items:center; gap:7px;
+  padding:2px 3px; border-radius:2px; cursor:pointer;
+  font-size:10px; transition:background .1s;
+}
+.tl-row:hover { background:var(--bg); }
+.tl-row.active { background:rgba(44,110,138,.08); }
+.tl-h { color:var(--muted); min-width:24px; }
+.tl-bar-bg { flex:1; height:5px; background:var(--s2); border-radius:3px; overflow:hidden; }
+.tl-bar { height:100%; border-radius:3px; transition:width .3s; }
+.tl-t { color:var(--text); min-width:36px; text-align:right; }
+
+/* Markers */
+.sm {
+  border-radius:50%; border:1.5px solid rgba(255,255,255,.75);
+  box-shadow:0 1px 4px rgba(0,0,0,.3); cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+}
+.sm:hover { transform:scale(1.5); box-shadow:0 2px 8px rgba(0,0,0,.4); }
+.sm.selected {
+  border:2px solid #fff;
+  box-shadow:0 0 0 2px var(--accent),0 2px 8px rgba(0,0,0,.4);
+  transform:scale(1.5);
+}
+
+/* Rectangle de sélection */
+.leaflet-interactive.draw-rect {
+  stroke: var(--accent) !important;
+  stroke-width: 2 !important;
+  fill: rgba(44,110,138,.08) !important;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-name">Névé</span>
+    <span class="brand-sub">conditions de neige</span>
+  </div>
+  <div class="api-url-wrap">
+    <span class="api-lbl">API</span>
+    <input id="apiUrl" type="text" value="http://127.0.0.1:8000" placeholder="http://127.0.0.1:8000">
+  </div>
+  <div class="status">
+    <div class="dot" id="dot"></div>
+    <span class="status-txt" id="statusTxt">Dessinez une zone sur la carte</span>
+  </div>
+</header>
+
+<div class="time-bar">
+  <div class="time-big" id="timeBig">12h</div>
+  <div class="slider-col">
+    <input type="range" id="slider" min="0" max="23" value="12">
+    <div class="hour-ticks">
+      <span>00</span><span>03</span><span>06</span><span>09</span>
+      <span>12</span><span>15</span><span>18</span><span>21</span><span>23</span>
+    </div>
+  </div>
+  <div class="date-input-wrap">
+    <label>Date</label>
+    <input type="date" id="dateInput">
+  </div>
+</div>
+
+<div class="main">
+  <div id="map">
+    <!-- Hint dessin -->
+    <div class="draw-hint" id="drawHint">
+      Cliquez et glissez pour délimiter une zone · max 5 × 5 km
+    </div>
+
+    <!-- Info bbox -->
+    <div class="bbox-info" id="bboxInfo">
+      <div class="bbox-dims" id="bboxDims">— × — km</div>
+      <div class="bbox-coords" id="bboxCoords">—</div>
+    </div>
+
+    <!-- Boutons carte -->
+    <div class="btn-group" id="btnGroup">
+      <button class="map-btn" id="btnDraw" onclick="setDrawMode(!drawMode)">Dessiner une zone</button>
+      <button class="map-btn primary" id="btnCalc" disabled>Calculer</button>
+      <button class="map-btn danger"  id="btnClear" style="display:none">Effacer</button>
+      <button class="map-btn"         id="btnDemo">Charger démo</button>
+    </div>
+
+    <!-- Loader -->
+    <div class="map-loader" id="mapLoader">
+      <div class="spinner"></div>
+      <div class="loader-txt" id="loaderTxt">calcul en cours…</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+
+    <!-- Conditions (accordéon) -->
+    <div class="sb-section" id="sec-conditions">
+      <div class="sb-header" onclick="toggleSection('sec-conditions')">
+        <span class="sb-label">Conditions</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body">
+        <div id="legend"></div>
+      </div>
+    </div>
+
+    <!-- Statistiques (accordéon) -->
+    <div class="sb-section" id="sec-stats">
+      <div class="sb-header" onclick="toggleSection('sec-stats')">
+        <span class="sb-label">Statistiques</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body">
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-val" id="sNb">—</div><div class="stat-lbl">Points</div></div>
+          <div class="stat-box"><div class="stat-val" id="sMin">—</div><div class="stat-lbl">Alt. min</div></div>
+          <div class="stat-box"><div class="stat-val" id="sMax">—</div><div class="stat-lbl">Alt. max</div></div>
+          <div class="stat-box"><div class="stat-val" id="sSlope">—</div><div class="stat-lbl">Pente moy.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détail (accordéon, flex:1 pour prendre l'espace restant) -->
+    <div class="sb-section" id="sec-detail" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div class="sb-header" onclick="toggleSection('sec-detail')">
+        <span class="sb-label">Détail point</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body" id="detail" style="flex:1;overflow-y:auto;padding-top:4px">
+        <div class="detail-empty">Cliquez sur un point de la carte.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const CONDS = {
+  POWDER_COLD: { label:'Poudre froide',       color:'#2a7fd4' },
+  POWDER_WARM: { label:'Poudre réchauffée',   color:'#60a8e8' },
+  SPRING_SNOW: { label:'Neige de printemps',  color:'#d4820a' },
+  OLD_PACKED:  { label:'Neige ancienne',      color:'#5a90b8' },
+  CRUST:       { label:'Croûte de regel',     color:'#c0021a' },
+  WET_HEAVY:   { label:'Neige humide',        color:'#7a4a1e' },
+  NO_SNOW:     { label:'Pas de neige',        color:'#b0a898' },
+  UNDEFINED:   { label:'Indéterminé',         color:'#aaa'    },
+};
+
+const MAX_KM = 5;   // limite bbox en km
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let hour = 12, data = null, markers = [], selectedPoint = null;
+let hiddenConds = new Set();
+let bbox = null;
+let drawRect = null;
+let isDrawing = false;
+let drawStart = null;
+
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+const map = L.map('map', { center:[45.925, 6.90], zoom:13, zoomControl:true });
+
+L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  attribution:'© OpenStreetMap contributors, © OpenTopoMap (CC-BY-SA)',
+  maxZoom:17,
+}).addTo(map);
+
+// Date par défaut = aujourd'hui
+document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function clampBbox(latS, lonW, latN, lonE) {
+  // S'assure que la bbox ne dépasse pas MAX_KM dans chaque dimension
+  let dLat = latN - latS;
+  let dLon = lonE - lonW;
+
+  const hKm = haversineKm(latS, lonW, latN, lonW);
+  const wKm = haversineKm(latS, lonW, latS, lonE);
+
+  if (hKm > MAX_KM) {
+    const ratio = MAX_KM / hKm;
+    const center = (latS + latN) / 2;
+    dLat = dLat * ratio;
+    latS = center - dLat/2;
+    latN = center + dLat/2;
+  }
+  if (wKm > MAX_KM) {
+    const ratio = MAX_KM / wKm;
+    const center = (lonW + lonE) / 2;
+    dLon = dLon * ratio;
+    lonW = center - dLon/2;
+    lonE = center + dLon/2;
+  }
+  return [latS, lonW, latN, lonE];
+}
+
+function bboxDimsKm(b) {
+  const h = haversineKm(b.lat_min, b.lon_min, b.lat_max, b.lon_min);
+  const w = haversineKm(b.lat_min, b.lon_min, b.lat_min, b.lon_max);
+  return { h: h.toFixed(1), w: w.toFixed(1) };
+}
+
+// ── DESSIN DE LA BOX ──────────────────────────────────────────────────────────
+let drawMode = false;
+
+function setDrawMode(on) {
+  drawMode = on;
+  const btn = document.getElementById('btnDraw');
+  if (on) {
+    btn.textContent = 'Annuler';
+    btn.classList.add('primary');
+    map.getContainer().style.cursor = 'crosshair';
+  } else {
+    btn.textContent = 'Dessiner une zone';
+    btn.classList.remove('primary');
+    map.getContainer().style.cursor = '';
+    isDrawing = false;
+    drawStart = null;
+    map.dragging.enable();
+  }
+}
+
+map.on('mousedown', (e) => {
+  if (!drawMode) return;
+  if (e.originalEvent.button !== 0) return;
+
+  isDrawing = true;
+  drawStart = e.latlng;
+  map.dragging.disable();
+
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+});
+
+map.on('mousemove', (e) => {
+  if (!isDrawing || !drawStart) return;
+
+  const [latS, lonW, latN, lonE] = clampBbox(
+    Math.min(drawStart.lat, e.latlng.lat),
+    Math.min(drawStart.lng, e.latlng.lng),
+    Math.max(drawStart.lat, e.latlng.lat),
+    Math.max(drawStart.lng, e.latlng.lng),
+  );
+
+  const bounds = [[latS, lonW],[latN, lonE]];
+  if (drawRect) map.removeLayer(drawRect);
+  drawRect = L.rectangle(bounds, {
+    color: '#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.08,
+    interactive: false,
+  }).addTo(map);
+
+  const dims = bboxDimsKm({ lat_min:latS, lon_min:lonW, lat_max:latN, lon_max:lonE });
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+  document.getElementById('bboxCoords').textContent =
+    `${latS.toFixed(3)}°N ${lonW.toFixed(3)}°E → ${latN.toFixed(3)}°N ${lonE.toFixed(3)}°E`;
+  document.getElementById('bboxInfo').classList.add('visible');
+});
+
+map.on('mouseup', (e) => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  map.dragging.enable();
+  if (!drawStart) return;
+
+  const latS = Math.min(drawStart.lat, e.latlng.lat);
+  const lonW = Math.min(drawStart.lng, e.latlng.lng);
+  const latN = Math.max(drawStart.lat, e.latlng.lat);
+  const lonE = Math.max(drawStart.lng, e.latlng.lng);
+  const [csS, cwW, cnN, ceE] = clampBbox(latS, lonW, latN, lonE);
+
+  const w = haversineKm(csS, cwW, csS, ceE);
+  const h = haversineKm(csS, cwW, cnN, cwW);
+  if (w < 0.2 || h < 0.2) {
+    if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+    document.getElementById('bboxInfo').classList.remove('visible');
+    drawStart = null;
+    return;
+  }
+
+  bbox = { lat_min:csS, lon_min:cwW, lat_max:cnN, lon_max:ceE };
+
+  if (drawRect) map.removeLayer(drawRect);
+  drawRect = L.rectangle([[csS, cwW],[cnN, ceE]], {
+    color:'#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.06,
+    interactive: false,
+  }).addTo(map);
+
+  const dims = bboxDimsKm(bbox);
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+  document.getElementById('bboxCoords').textContent =
+    `${csS.toFixed(3)}°N ${cwW.toFixed(3)}°E → ${cnN.toFixed(3)}°N ${ceE.toFixed(3)}°E`;
+
+  document.getElementById('btnCalc').disabled = false;
+  document.getElementById('btnClear').style.display = 'block';
+  document.getElementById('drawHint').classList.add('hidden');
+  drawStart = null;
+  setDrawMode(false);  // repasser en mode navigation automatiquement
+});
+
+function clearAll() {
+  setDrawMode(false);
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+  clearMarkers();
+  bbox = null; data = null; selectedPoint = null;
+  document.getElementById('btnCalc').disabled = true;
+  document.getElementById('btnClear').style.display = 'none';
+  document.getElementById('bboxInfo').classList.remove('visible');
+  document.getElementById('drawHint').classList.remove('hidden');
+  document.getElementById('dot').className = 'dot';
+  document.getElementById('statusTxt').textContent = 'Dessinez une zone sur la carte';
+  document.getElementById('detail').innerHTML =
+    '<div class="detail-empty">Dessinez une zone puis cliquez sur un point.</div>';
+  resetStats();
+}
+
+// ── MARKERS ───────────────────────────────────────────────────────────────────
+function clearMarkers() {
+  markers.forEach(m => map.removeLayer(m.lm));
+  markers = [];
+}
+
+function renderMarkers() {
+  clearMarkers();
+  if (!data) return;
+
+  data.points.forEach(pt => {
+    const hd = pt.hours.find(h => h.hour === hour);
+    if (!hd) return;
+    const cond = hd.condition;
+    if (hiddenConds.has(cond)) return;
+
+    const meta = CONDS[cond] || CONDS.UNDEFINED;
+    const sz = 11; // taille fixe — la pente est visible sur la carte topo
+
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="sm" style="width:${sz}px;height:${sz}px;background:${meta.color}"></div>`,
+      iconSize:[sz,sz], iconAnchor:[sz/2,sz/2],
+    });
+
+    const lm = L.marker([pt.lat, pt.lon], { icon }).addTo(map);
+    lm.on('click', () => selectPoint(pt, lm));
+    markers.push({ lm, pt, cond });
+  });
+
+  updateLegendCounts();
+  updateStats();
+}
+
+function selectPoint(pt, lm) {
+  markers.forEach(m => m.lm.getElement()?.querySelector('.sm')?.classList.remove('selected'));
+  lm.getElement()?.querySelector('.sm')?.classList.add('selected');
+  selectedPoint = pt;
+  renderDetail();
+}
+
+// ── LÉGENDE ───────────────────────────────────────────────────────────────────
+function buildLegend() {
+  const c = document.getElementById('legend');
+  Object.entries(CONDS).forEach(([key, meta]) => {
+    if (key === 'UNDEFINED') return;
+    const el = document.createElement('div');
+    el.className = 'leg-item'; el.dataset.key = key;
+    el.innerHTML = `
+      <div class="leg-swatch" style="background:${meta.color}"></div>
+      <div class="leg-name">${meta.label}</div>
+      <div class="leg-count" id="lc-${key}">—</div>`;
+    el.addEventListener('click', () => {
+      hiddenConds.has(key) ? hiddenConds.delete(key) : hiddenConds.add(key);
+      el.classList.toggle('off');
+      renderMarkers();
+    });
+    c.appendChild(el);
+  });
+}
+
+function updateLegendCounts() {
+  const counts = {};
+  data?.points.forEach(pt => {
+    const hd = pt.hours.find(h => h.hour === hour);
+    if (hd) counts[hd.condition] = (counts[hd.condition]||0) + 1;
+  });
+  Object.keys(CONDS).forEach(k => {
+    const el = document.getElementById(`lc-${k}`);
+    if (el) el.textContent = counts[k] ?? '0';
+  });
+}
+
+function updateStats() {
+  if (!data?.points.length) return;
+  const elevs  = data.points.map(p => p.elevation_m).filter(Boolean);
+  const slopes = data.points.map(p => p.slope_deg).filter(Boolean);
+  document.getElementById('sNb').textContent    = data.points.length;
+  document.getElementById('sMin').textContent   = Math.round(Math.min(...elevs)) + 'm';
+  document.getElementById('sMax').textContent   = Math.round(Math.max(...elevs)) + 'm';
+  document.getElementById('sSlope').textContent = (slopes.reduce((a,b)=>a+b,0)/slopes.length).toFixed(0)+'°';
+}
+
+function resetStats() {
+  ['sNb','sMin','sMax','sSlope'].forEach(id => document.getElementById(id).textContent = '—');
+  Object.keys(CONDS).forEach(k => {
+    const el = document.getElementById(`lc-${k}`);
+    if (el) el.textContent = '—';
+  });
+}
+
+// ── DÉTAIL ────────────────────────────────────────────────────────────────────
+function renderDetail() {
+  if (!selectedPoint) return;
+  const pt = selectedPoint;
+  const hd = pt.hours.find(h => h.hour === hour) || pt.hours[0];
+  const meta = CONDS[hd.condition] || CONDS.UNDEFINED;
+  const tMin = Math.min(...pt.hours.map(h => h.temp_surface));
+  const tMax = Math.max(...pt.hours.map(h => h.temp_surface));
+  const tRange = tMax - tMin || 1;
+  const aspNames = {0:'Nord',45:'Nord-Est',90:'Est',135:'Sud-Est',
+                    180:'Sud',225:'Sud-Ouest',270:'Ouest',315:'Nord-Ouest'};
+  const aspLabel = aspNames[Math.round((pt.aspect_deg||0)/45)*45] || pt.aspect_label || '—';
+
+  document.getElementById('detail').innerHTML = `
+    <div class="sb-label">Détail point</div>
+    <div class="detail-coords">${pt.lat.toFixed(4)}°N &nbsp;${pt.lon.toFixed(4)}°E</div>
+    <div class="cond-badge" style="background:${meta.color}18;color:${meta.color};border:1px solid ${meta.color}44">
+      <div style="width:7px;height:7px;border-radius:50%;background:${meta.color}"></div>
+      ${meta.label}
+    </div>
+    <div class="detail-row"><span class="dr-lbl">Altitude</span><span class="dr-val">${pt.elevation_m} m</span></div>
+    <div class="detail-row"><span class="dr-lbl">Exposition</span><span class="dr-val">${aspLabel}</span></div>
+    <div class="detail-row"><span class="dr-lbl">Pente</span><span class="dr-val">${(pt.slope_deg||0).toFixed(1)}°</span></div>
+    <div class="detail-row"><span class="dr-lbl">T° surface</span><span class="dr-val">${hd.temp_surface>0?'+':''}${hd.temp_surface}°C</span></div>
+    <div class="detail-row"><span class="dr-lbl">Vent</span><span class="dr-val">${hd.wind_speed} m/s</span></div>
+    <div class="tl-wrap">
+      <div class="sb-label" style="margin-top:12px;margin-bottom:5px">24 heures</div>
+      ${pt.hours.map(h => {
+        const hm = CONDS[h.condition] || CONDS.UNDEFINED;
+        const w = Math.max(4, Math.round(((h.temp_surface-tMin)/tRange)*100));
+        return `<div class="tl-row ${h.hour===hour?'active':''}" onclick="setHour(${h.hour})">
+          <span class="tl-h">${String(h.hour).padStart(2,'0')}h</span>
+          <div class="tl-bar-bg"><div class="tl-bar" style="width:${w}%;background:${hm.color}"></div></div>
+          <span class="tl-t">${h.temp_surface>0?'+':''}${h.temp_surface}°</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── HEURE ─────────────────────────────────────────────────────────────────────
+function setHour(h) {
+  hour = h;
+  document.getElementById('slider').value = h;
+  document.getElementById('timeBig').textContent = String(h).padStart(2,'0') + 'h';
+  renderMarkers();
+  if (selectedPoint) renderDetail();
+}
+
+// ── APPEL API ─────────────────────────────────────────────────────────────────
+async function calculate() {
+  if (!bbox) return;
+
+  const base = document.getElementById('apiUrl').value.replace(/\/$/,'');
+  const date = document.getElementById('dateInput').value || new Date().toISOString().slice(0,10);
+  const bboxStr = `${bbox.lat_min},${bbox.lon_min},${bbox.lat_max},${bbox.lon_max}`;
+  const url = `${base}/conditions?bbox=${encodeURIComponent(bboxStr)}&date=${date}&resolution_m=500`;
+
+  document.getElementById('mapLoader').classList.add('visible');
+  document.getElementById('dot').className = 'dot loading';
+  document.getElementById('statusTxt').textContent = 'calcul en cours…';
+  document.getElementById('btnCalc').disabled = true;
+
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    data = await r.json();
+
+    renderMarkers();
+    // Recentrer sur la bbox
+    map.fitBounds([[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]], { padding:[20,20] });
+
+    document.getElementById('dot').className = 'dot ok';
+    document.getElementById('statusTxt').textContent = `${data.points.length} points · ${data.date}`;
+  } catch(e) {
+    document.getElementById('dot').className = 'dot err';
+    document.getElementById('statusTxt').textContent = 'Erreur : ' + e.message;
+    document.getElementById('btnCalc').disabled = false;
+  } finally {
+    document.getElementById('mapLoader').classList.remove('visible');
+  }
+}
+
+// ── DÉMO ──────────────────────────────────────────────────────────────────────
+function loadDemo() {
+  // Bbox démo Chamonix
+  bbox = { lat_min:45.900, lon_min:6.850, lat_max:45.950, lon_max:6.950 };
+
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+  drawRect = L.rectangle(
+    [[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]],
+    { color:'#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.06, interactive:false }
+  ).addTo(map);
+  map.fitBounds([[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]], { padding:[20,20] });
+
+  document.getElementById('bboxInfo').classList.add('visible');
+  document.getElementById('btnClear').style.display = 'block';
+  document.getElementById('drawHint').classList.add('hidden');
+
+  const dims = bboxDimsKm(bbox);
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+
+  // Générer données démo
+  const pts = [];
+  const aspList = [0,45,90,135,180,225,270,315];
+  const aspKeys = ['N','NE','E','SE','S','SO','O','NO'];
+  for (let i = 0; i < 180; i++) {
+    const lat = 45.900 + Math.random()*.050;
+    const lon = 6.850  + Math.random()*.100;
+    const elev = 1100 + Math.random()*2200;
+    const ai = Math.floor(Math.random()*8);
+    const asp = aspList[ai];
+    const north = asp < 90 || asp > 270;
+    const south = asp > 90 && asp < 270;
+    const slope = 8 + Math.random()*40;
+    const snowLine = Math.max(800, 1800 - (new Date().getMonth()) * 80);
+
+    const hours = Array.from({length:24},(_,h) => {
+      let cond;
+      if (elev < snowLine) { cond = 'NO_SNOW'; }
+      else if (elev > 2800 && north) { cond = h<11||h>17 ? 'POWDER_COLD':'POWDER_WARM'; }
+      else if (elev > 2200 && north) { cond = h<8?'OLD_PACKED':h<15?'POWDER_WARM':'OLD_PACKED'; }
+      else if (south && elev<1800)   { cond = h<7?'OLD_PACKED':h<10?'SPRING_SNOW':'WET_HEAVY'; }
+      else if (south)                { cond = h<8?'OLD_PACKED':h<12?'SPRING_SNOW':h<17?'WET_HEAVY':'OLD_PACKED'; }
+      else                           { cond = h<7?'OLD_PACKED':h<10?'SPRING_SNOW':'WET_HEAVY'; }
+      const t = -5+Math.sin((h-6)*Math.PI/12)*10+(south?3:-3)-(elev-1500)/400;
+      return { hour:h, condition:cond, label:CONDS[cond]?.label||cond,
+               color:CONDS[cond]?.color||'#aaa',
+               temp_surface:Math.round(t*10)/10, wind_speed:+(2+Math.random()*7).toFixed(1) };
+    });
+    pts.push({ lat, lon, elevation_m:Math.round(elev),
+               aspect_deg:asp, aspect_label:aspKeys[ai],
+               slope_deg:Math.round(slope*10)/10, hours });
+  }
+  data = { date: new Date().toISOString().slice(0,10), points: pts };
+  renderMarkers();
+
+  document.getElementById('dot').className = 'dot ok';
+  document.getElementById('statusTxt').textContent = `${pts.length} points · démo`;
+}
+
+// ── ACCORDÉON ─────────────────────────────────────────────────────────────────
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildLegend();
+document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+
+document.getElementById('slider').addEventListener('input', e => setHour(parseInt(e.target.value)));
+document.getElementById('btnCalc').addEventListener('click', calculate);
+document.getElementById('btnClear').addEventListener('click', clearAll);
+document.getElementById('btnDemo').addEventListener('click', loadDemo);
+</script>
+</body>
+</html>

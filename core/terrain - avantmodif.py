@@ -372,20 +372,23 @@ def get_terrain_data(
     return _static_estimate(lat, lon)
 
 
-
-
 def get_terrain_grid(
     lat_min: float, lon_min: float,
     lat_max: float, lon_max: float,
     resolution_m: float = 500,
     tiff_path: Optional[str] = None,
-    padding_m: float = 0,
+    padding_m: float = 0,           # ← nouveau paramètre
 ) -> List[TerrainPoint]:
-    import numpy as np
-
+    """
+    Retourne une grille de TerrainPoints sur la bbox donnée.
+    padding_m : marge autour de la bbox pour le contexte terrain (ombres portées).
+                Les points de padding ont is_padding=True — calculés mais non affichés.
+    """
+    # Conversion padding → degrés
     pad_lat = padding_m / 111_000
     pad_lon = padding_m / (111_000 * math.cos(math.radians((lat_min + lat_max) / 2)))
 
+    # Bbox étendue pour le calcul
     lat_min_ext = lat_min - pad_lat
     lat_max_ext = lat_max + pad_lat
     lon_min_ext = lon_min - pad_lon
@@ -393,61 +396,19 @@ def get_terrain_grid(
 
     delta_lat = resolution_m / 111_000
     delta_lon = resolution_m / (111_000 * math.cos(math.radians((lat_min + lat_max) / 2)))
-    delta_elev = 0.001  # ~100m pour le voisinage Horn
 
-    # 1. Collecter tous les points centre + leurs 8 voisins
-    centers = []
+    points = []
     lat = lat_min_ext
     while lat <= lat_max_ext + 1e-9:
         lon = lon_min_ext
         while lon <= lon_max_ext + 1e-9:
-            centers.append((round(lat, 6), round(lon, 6)))
+            tp = get_terrain_data(lat, lon, tiff_path=tiff_path)
+            # Marquer si le point est dans la bbox visible ou dans le padding
+            tp.is_padding = not (lat_min <= lat <= lat_max
+                                 and lon_min <= lon <= lon_max)
+            points.append(tp)
             lon += delta_lon
         lat += delta_lat
-
-    # 2. Construire la liste de tous les points à interroger (centre + 8 voisins)
-    all_locations = []
-    for (clat, clon) in centers:
-        for dy in (1, 0, -1):
-            for dx in (-1, 0, 1):
-                all_locations.append({
-                    "latitude":  round(clat + dy * delta_elev, 6),
-                    "longitude": round(clon + dx * delta_elev, 6),
-                })
-
-    # 3. Une seule requête POST Open-Elevation
-    try:
-        payload = json.dumps({"locations": all_locations}).encode()
-        req = urllib.request.Request(
-            "https://api.open-elevation.com/api/v1/lookup",
-            data=payload,
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = json.loads(resp.read())
-        elevations = [float(r["elevation"]) for r in data["results"]]
-    except Exception as e:
-        print(f"[terrain] Open-Elevation batch failed: {e}")
-        elevations = [1500.0] * len(all_locations)
-        
-        
-    # 4. Calculer aspect/slope pour chaque centre
-    cell_m = delta_elev * 111_000
-    points = []
-    for i, (clat, clon) in enumerate(centers):
-        block = elevations[i*9 : i*9 + 9]
-        z = np.array(block).reshape(3, 3)
-        elev = z[1, 1]
-        aspect, slope = _compute_aspect_slope(z, cell_m)
-        tp = TerrainPoint(
-            lat=clat, lon=clon,
-            elevation_m=elev,
-            aspect_deg=aspect,
-            slope_deg=slope,
-            is_padding=not (lat_min <= clat <= lat_max and lon_min <= clon <= lon_max)
-        )
-        points.append(tp)
 
     return points
 

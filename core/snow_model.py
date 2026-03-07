@@ -26,7 +26,8 @@ class SnowCondition(Enum):
     SPRING_SNOW   = "neige_de_printemps"  # transformée, agréable à skier
     CRUST         = "croute_regel"        # regel nocturne, surface dure
     WET_HEAVY     = "neige_humide"        # détrempée, lourde, dangereuse
-    OLD_PACKED    = "neige ancienne tassee" # vieille neige tassée
+    OLD_PACKED    = "neige_ancienne_tassee" # vieille neige tassée
+    NO_SNOW       = "pas_de_neige"        # pas de neige
 
     def label(self) -> str:
         labels = {
@@ -35,7 +36,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  "Neige de printemps",
             "croute_regel":        "Croûte de regel",
             "neige_humide":        "Neige humide lourde",
-            "neige ancienne tassee":"Neige ancienne tassée",
+            "neige_ancienne_tassee":"Neige ancienne tassée",
+            "pas_de_neige":        "Pas de neige",
         }
         return labels[self.value]
 
@@ -46,7 +48,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  "#F5A623",   # orange
             "croute_regel":        "#D0021B",   # rouge
             "neige_humide":        "#8B572A",   # marron
-            "neige ancienne tassee":"#B8D4F0",  #bleu pale
+            "neige_ancienne_tassee":"#B8D4F0",  #bleu pale
+            "pas_de_neige":        "#c8bfb0",   #beige / gris neutre
         }
         return colors[self.value]
 
@@ -58,6 +61,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  3,
             "croute_regel":        2,
             "neige_humide":        1,
+            "neige_ancienne_tassee":2,
+            "pas_de_neige":        0,
         }
         return scores[self.value]
 
@@ -154,6 +159,18 @@ def classify_snow_condition(
     """
     temp_surface = compute_surface_temperature(point, weather, month, day)
     fresh_snow   = weather.snowfall_last_72h
+    
+    # ------------------------------------------------------------------
+    # RÈGLE 0 — PAS DE NEIGE
+    # En dessous du seuil d'enneigement climatologique pour les Alpes
+    # ------------------------------------------------------------------
+    snow_line = max(800, 1800 - (month - 1) * 80)  # ~1800m en janvier, ~1100m en juin
+    if (point.elevation < snow_line
+            and weather.snowfall_last_72h == 0
+            and temp_surface > 2):
+        return SnowCondition.NO_SNOW, temp_surface
+    
+    
 
     # ------------------------------------------------------------------
     # RÈGLE 1 — CROÛTE DE REGEL

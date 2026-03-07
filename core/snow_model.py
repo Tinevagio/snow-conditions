@@ -213,7 +213,8 @@ def classify_snow_condition(
     # ------------------------------------------------------------------
     if (0 <= temp_surface <= 1.5
             and weather.hours_above_zero_last_48h >= 3
-            and fresh_snow < 10):
+            and fresh_snow < 10
+            and weather.shortwave_radiation > 150):   # soleil réel requis
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------

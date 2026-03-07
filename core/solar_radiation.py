@@ -181,6 +181,14 @@ def effective_radiation(hour_utc: float, lat: float, lon: float,
                                total_radiation=0.0, temperature_correction=0.0)
 
     inc_angle         = incidence_angle_on_slope(sol_pos, aspect, slope)
+    
+    # Dans effective_radiation(), après le calcul de inc_angle :
+    if inc_angle >= 90.0:
+        return RadiationResult(solar_position=sol_pos,
+                               incidence_angle_deg=90.0,
+                               direct_radiation=0.0, diffuse_radiation=0.0,
+                               total_radiation=0.0, temperature_correction=0.0)
+                               
     I0                = extraterrestrial_radiation(doy)
     tau               = atmospheric_transmittance(sol_pos.elevation_deg, altitude_m)
     direct_horizontal = I0 * tau * _sin(sol_pos.elevation_deg)

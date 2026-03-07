@@ -32,8 +32,8 @@ except ImportError:
 
 OPENMETEO_BASE_URL = "https://api.open-meteo.com/v1/forecast"
 VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation","direct_radiation", "snowfall"]
-PAST_DAYS = 5
-FORECAST_DAYS = 2
+PAST_DAYS = 90
+FORECAST_DAYS = 15
 
 
 def fetch_raw(lat: float, lon: float) -> dict:

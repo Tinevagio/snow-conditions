@@ -271,12 +271,7 @@ def _compute_windows(
         if best_len >= 2:
             spring_optimal = best_start + best_len // 2
     
-    """
-    for w in sorted(weather_series, key=lambda x: x.hour):
-        cond, _ = classify_snow_condition(gp, w, month, day)
-        print(f"  h={w.hour:02d} direct={w.direct_radiation:.1f} cond={cond.name}")
-        if cond.name == 'SPRING_SNOW' and w.hour <= 20:
-            spring_hours.append(w.hour)"""
+    
     
     return {
         "powder_until_hour": powder_until,

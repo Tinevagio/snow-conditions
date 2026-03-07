@@ -116,8 +116,8 @@ def get_hourly_weather(lat, lon, target_date=None) -> List[HourlyWeather]:
             direct_radiation = _safe(hourly["direct_radiation"], idx),
         ))
     
-    for w in results:
-        print(f"h={w.hour:02d} direct={w.direct_radiation:6.1f} shortwave={w.shortwave_radiation:6.1f}")
+    """for w in results:
+        print(f"h={w.hour:02d} direct={w.direct_radiation:6.1f} shortwave={w.shortwave_radiation:6.1f}")"""
     return results
 
 

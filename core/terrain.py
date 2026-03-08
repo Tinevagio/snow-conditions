@@ -180,7 +180,8 @@ def _fetch_from_ign_wcs(lat: float, lon: float, delta: float = 0.003) -> Optiona
                 aspect, slope = _compute_aspect_slope(data, cell_m)
                 return TerrainPoint(lat=lat, lon=lon, elevation_m=elev,
                                     aspect_deg=aspect, slope_deg=slope)
-    except Exception:
+    except Exception as e:
+        print(f"[IGN WCS] erreur: {type(e).__name__}: {e}")
         return None
 
 

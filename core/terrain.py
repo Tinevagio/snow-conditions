@@ -356,19 +356,23 @@ def get_terrain_data(
     if tiff_path:
         result = _extract_from_geotiff(tiff_path, lat, lon)
         if result:
+            print(f"[terrain] GeoTIFF {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
             return result
 
     # 2. API WCS IGN
     result = _fetch_from_ign_wcs(lat, lon)
     if result:
+        print(f"[terrain] IGN WCS {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
         return result
 
     # 3. Open-Elevation (fallback réseau léger)
     result = _estimate_terrain_from_neighbors(lat, lon)
     if result:
+        print(f"[terrain] Open-Elev {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
         return result
 
     # 4. Estimation statique
+    print(f"[terrain] STATIC {lat:.4f},{lon:.4f}")
     return _static_estimate(lat, lon)
 
 

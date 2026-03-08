@@ -212,14 +212,7 @@ def classify_snow_condition(
     # RÈGLE 5 — NEIGE DE PRINTEMPS
     # Neige ancienne, surface positive, transformation en cours
     # ------------------------------------------------------------------
-    print(f"  RÈGLE5 check h={weather.hour:02d} temp_surf={temp_surface:.2f} direct={weather.direct_radiation:.0f} h>0={weather.hours_above_zero_last_48h} fresh={fresh_snow}")
     
-    """
-    if (0 <= temp_surface <= 1.5
-            and weather.hours_above_zero_last_48h >= 3
-            and fresh_snow < 10
-            and weather.direct_radiation > 50):
-        return SnowCondition.SPRING_SNOW, temp_surface"""
     if (0 <= temp_surface <= 5.0          # élargi : jusqu'à 3°C
             and fresh_snow < 10
             and weather.direct_radiation > 50):

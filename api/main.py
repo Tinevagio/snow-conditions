@@ -28,6 +28,9 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 # ---------------------------------------------------------------------------
 # Imports internes — chemins relatifs au projet
 # ---------------------------------------------------------------------------

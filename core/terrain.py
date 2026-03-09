@@ -70,8 +70,8 @@ class TerrainPoint:
 def _compute_aspect_slope(z: "np.ndarray", cell_size_m: float) -> Tuple[float, float]:
     dz_dx = ((z[0, 2] + 2 * z[1, 2] + z[2, 2]) -
               (z[0, 0] + 2 * z[1, 0] + z[2, 0])) / (8 * cell_size_m)
-    dz_dy = ((z[2, 0] + 2 * z[2, 1] + z[2, 2]) -
-              (z[0, 0] + 2 * z[0, 1] + z[0, 2])) / (8 * cell_size_m)
+    dz_dy = ((z[0, 0] + 2 * z[0, 1] + z[0, 2]) -
+          (z[2, 0] + 2 * z[2, 1] + z[2, 2])) / (8 * cell_size_m)
 
     slope_deg = math.degrees(math.atan(math.sqrt(dz_dx**2 + dz_dy**2)))
 

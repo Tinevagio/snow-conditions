@@ -4,31 +4,22 @@ terrain.py
 Lecture du Modèle Numérique de Terrain (MNT) IGN pour extraire
 l'élévation, l'exposition (aspect) et l'inclinaison (slope) par point GPS.
 
-Deux modes de fonctionnement :
+Sources (par ordre de priorité) :
   1. Fichier GeoTIFF local (RGE ALTI® IGN, résolution 5m ou 25m)
-  2. API distante IGN (WCS - Web Coverage Service) si pas de fichier local
-
-Structure retournée par get_terrain_data() :
-  TerrainPoint(lat, lon, elevation_m, aspect_deg, slope_deg)
+  2. API Altimétrie IGN REST (data.geopf.fr) — batch, sans clé, RGEAlti
+  3. Open-Elevation API (fallback)
+  4. Estimation statique (dernier recours)
 
 Conventions :
   aspect_deg : 0° = Nord, 90° = Est, 180° = Sud, 270° = Ouest
   slope_deg  : 0° = plat, 90° = vertical
-
-Dépendances :
-  - rasterio  (lecture GeoTIFF)
-  - pyproj    (reprojection GPS ↔ Lambert93)
-  - numpy
-  - urllib    (stdlib, appel WCS IGN si pas de fichier local)
 """
 
 import math
 import json
 import urllib.request
-import urllib.parse
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import numpy as np
@@ -48,8 +39,8 @@ class TerrainPoint:
     lat: float
     lon: float
     elevation_m: float
-    aspect_deg: float   # 0=Nord, 90=Est, 180=Sud, 270=Ouest
-    slope_deg: float    # 0=plat, 90=vertical
+    aspect_deg: float
+    slope_deg: float
     is_padding: bool = False
 
     def aspect_label(self) -> str:
@@ -71,36 +62,32 @@ class TerrainPoint:
         a = self.aspect_deg % 360
         return 135 < a < 225
 
+
 # ---------------------------------------------------------------------------
-# Calculs géométriques (pente + exposition) à partir d'une grille d'élévation
+# Calculs géométriques Horn (1981)
 # ---------------------------------------------------------------------------
 
-def _compute_aspect_slope(
-    z: "np.ndarray",
-    cell_size_m: float
-) -> Tuple[float, float]:
+def _compute_aspect_slope(z: "np.ndarray", cell_size_m: float) -> Tuple[float, float]:
     dz_dx = ((z[0, 2] + 2 * z[1, 2] + z[2, 2]) -
               (z[0, 0] + 2 * z[1, 0] + z[2, 0])) / (8 * cell_size_m)
     dz_dy = ((z[2, 0] + 2 * z[2, 1] + z[2, 2]) -
               (z[0, 0] + 2 * z[0, 1] + z[0, 2])) / (8 * cell_size_m)
 
-    slope_rad = math.atan(math.sqrt(dz_dx ** 2 + dz_dy ** 2))
-    slope_deg = math.degrees(slope_rad)
+    slope_deg = math.degrees(math.atan(math.sqrt(dz_dx**2 + dz_dy**2)))
 
     if dz_dx == 0 and dz_dy == 0:
         aspect_deg = 0.0
     else:
-        aspect_rad = math.atan2(dz_dx, -dz_dy)
-        aspect_deg = math.degrees(aspect_rad) % 360
+        aspect_deg = math.degrees(math.atan2(dz_dx, -dz_dy)) % 360
 
     return aspect_deg, slope_deg
 
 
 # ---------------------------------------------------------------------------
-# Mode 1 : lecture d'un fichier GeoTIFF local (rasterio requis)
+# Mode 1 : GeoTIFF local
 # ---------------------------------------------------------------------------
 
-def _extract_from_geotiff(tiff_path, lat, lon):
+def _extract_from_geotiff(tiff_path: str, lat: float, lon: float) -> Optional[TerrainPoint]:
     if not RASTERIO_AVAILABLE:
         return None
     try:
@@ -123,8 +110,7 @@ def _extract_from_geotiff(tiff_path, lat, lon):
             elev = float(data[1, 1])
             res_x = abs(src.transform.a)
             res_y = abs(src.transform.e)
-            cell_size = (res_x + res_y) / 2
-            aspect, slope = _compute_aspect_slope(data, cell_size)
+            aspect, slope = _compute_aspect_slope(data, (res_x + res_y) / 2)
             return TerrainPoint(lat=lat, lon=lon, elevation_m=elev,
                                 aspect_deg=aspect, slope_deg=slope)
     except Exception as e:
@@ -133,87 +119,60 @@ def _extract_from_geotiff(tiff_path, lat, lon):
 
 
 # ---------------------------------------------------------------------------
-# Mode 2 : API WCS IGN
+# Mode 2 : API Altimétrie IGN REST (batch multi-points)
 # ---------------------------------------------------------------------------
 
-IGN_WCS_URL = (
-    "https://data.geopf.fr/wcs"
-    "?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage"
-    "&COVERAGEID=RGEALTI_MNT_5M_ASC_LAMB93_IGN69"
-    "&FORMAT=image/tiff"
-    "&SUBSETTINGCRS=EPSG:4326"
-    "&OUTPUTCRS=EPSG:4326"
-    "&SUBSET=Long({lon_min},{lon_max})"
-    "&SUBSET=Lat({lat_min},{lat_max})"
-)
+IGN_ALTI_URL      = "https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json"
+IGN_ALTI_RESOURCE = "ign_rge_alti_wld"
+IGN_ALTI_MAX_PTS  = 5000  # limite de l'API par requête
 
-def _fetch_from_ign_wcs(lat: float, lon: float, delta: float = 0.003) -> Optional[TerrainPoint]:
-    if not RASTERIO_AVAILABLE:
-        return None
+
+def _fetch_elevations_ign(locations: list) -> Optional[list]:
+    """
+    Batch IGN altimétrie REST — tous les points en une seule requête GET.
+    locations : liste de dicts {"latitude": y, "longitude": x}
+    Retourne liste de floats ou None si erreur.
+    """
+    lons = "|".join(str(p["longitude"]) for p in locations)
+    lats = "|".join(str(p["latitude"])  for p in locations)
+    url  = (f"{IGN_ALTI_URL}?lon={lons}&lat={lats}"
+            f"&resource={IGN_ALTI_RESOURCE}&delimiter=|&zonly=true")
     try:
-        import numpy as np
-        import rasterio
-        from rasterio.io import MemoryFile
-
-        url = IGN_WCS_URL.format(
-            lon_min=lon - delta, lon_max=lon + delta,
-            lat_min=lat - delta, lat_max=lat + delta,
-        )
         req = urllib.request.Request(url, headers={"User-Agent": "snow-conditions/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            raw_bytes = resp.read()
-
-        with MemoryFile(raw_bytes) as memfile:
-            with memfile.open() as src:
-                transformer = Transformer.from_crs("EPSG:4326", src.crs.to_epsg(), always_xy=True)
-                x, y = transformer.transform(lon, lat)
-                row, col = rowcol(src.transform, x, y)
-                row_min = max(row - 1, 0)
-                col_min = max(col - 1, 0)
-                window = rasterio.windows.Window(col_min, row_min, 3, 3)
-                data = src.read(1, window=window).astype(float)
-                if data.shape != (3, 3):
-                    return None
-                elev = float(data[1, 1])
-                res = abs(src.transform.a)
-                cell_m = res * 111_000
-                aspect, slope = _compute_aspect_slope(data, cell_m)
-                return TerrainPoint(lat=lat, lon=lon, elevation_m=elev,
-                                    aspect_deg=aspect, slope_deg=slope)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+        elevations = [float(z) for z in data["elevations"]]
+        print(f"[terrain] IGN Altimétrie REST OK — {len(elevations)} points")
+        return elevations
     except Exception as e:
-        print(f"[IGN WCS] erreur: {type(e).__name__}: {e}")
+        print(f"[terrain] IGN Altimétrie REST erreur: {type(e).__name__}: {e}")
         return None
+
+
+def _fetch_elevation_ign_single(lat: float, lon: float) -> Optional[float]:
+    """Point unique IGN — pour get_terrain_data."""
+    result = _fetch_elevations_ign([{"latitude": lat, "longitude": lon}])
+    return result[0] if result else None
 
 
 # ---------------------------------------------------------------------------
 # Mode 3 : Open-Elevation (fallback batch)
 # ---------------------------------------------------------------------------
 
-def _estimate_terrain_from_neighbors(lat: float, lon: float) -> Optional[TerrainPoint]:
+def _fetch_elevations_open_elevation(locations: list) -> Optional[list]:
     try:
-        import numpy as np
-        delta = 0.001
-        points = [
-            {"latitude": lat + dy * delta, "longitude": lon + dx * delta}
-            for dy in (1, 0, -1) for dx in (-1, 0, 1)
-        ]
-        payload = json.dumps({"locations": points}).encode()
+        payload = json.dumps({"locations": locations}).encode()
         req = urllib.request.Request(
             "https://api.open-elevation.com/api/v1/lookup",
             data=payload,
             headers={"Content-Type": "application/json"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read())
-        elevs = [float(r["elevation"]) for r in data["results"]]
-        z = np.array(elevs).reshape(3, 3)
-        elev = z[1, 1]
-        cell_m = delta * 111_000
-        aspect, slope = _compute_aspect_slope(z, cell_m)
-        return TerrainPoint(lat=lat, lon=lon, elevation_m=elev,
-                            aspect_deg=aspect, slope_deg=slope)
-    except Exception:
+        return [float(r["elevation"]) for r in data["results"]]
+    except Exception as e:
+        print(f"[terrain] Open-Elevation erreur: {e}")
         return None
 
 
@@ -230,39 +189,47 @@ def _static_estimate(lat: float, lon: float) -> TerrainPoint:
 # Point d'entrée principal (point unique)
 # ---------------------------------------------------------------------------
 
-def get_terrain_data(lat, lon, tiff_path=None) -> TerrainPoint:
+def get_terrain_data(lat: float, lon: float, tiff_path: Optional[str] = None) -> TerrainPoint:
+    # 1. GeoTIFF local
     if tiff_path:
         result = _extract_from_geotiff(tiff_path, lat, lon)
         if result:
             print(f"[terrain] GeoTIFF {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
             return result
 
-    result = _fetch_from_ign_wcs(lat, lon)
-    if result:
-        print(f"[terrain] IGN WCS {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
-        return result
+    # 2. IGN Altimétrie REST (point unique + 8 voisins pour Horn)
+    delta = 0.001
+    locations = [
+        {"latitude": round(lat + dy * delta, 6), "longitude": round(lon + dx * delta, 6)}
+        for dy in (1, 0, -1) for dx in (-1, 0, 1)
+    ]
+    elevs = _fetch_elevations_ign(locations)
+    if elevs and len(elevs) == 9:
+        import numpy as np
+        z = np.array(elevs).reshape(3, 3)
+        aspect, slope = _compute_aspect_slope(z, delta * 111_000)
+        print(f"[terrain] IGN Alti {lat:.4f},{lon:.4f} → {aspect:.0f}°")
+        return TerrainPoint(lat=lat, lon=lon, elevation_m=float(z[1, 1]),
+                            aspect_deg=aspect, slope_deg=slope)
 
-    result = _estimate_terrain_from_neighbors(lat, lon)
-    if result:
-        print(f"[terrain] Open-Elev {lat:.4f},{lon:.4f} → {result.aspect_deg:.0f}°")
-        return result
+    # 3. Open-Elevation
+    elevs = _fetch_elevations_open_elevation(locations)
+    if elevs and len(elevs) == 9:
+        import numpy as np
+        z = np.array(elevs).reshape(3, 3)
+        aspect, slope = _compute_aspect_slope(z, delta * 111_000)
+        print(f"[terrain] Open-Elev {lat:.4f},{lon:.4f} → {aspect:.0f}°")
+        return TerrainPoint(lat=lat, lon=lon, elevation_m=float(z[1, 1]),
+                            aspect_deg=aspect, slope_deg=slope)
 
+    # 4. Statique
     print(f"[terrain] STATIC {lat:.4f},{lon:.4f}")
     return _static_estimate(lat, lon)
 
 
 # ---------------------------------------------------------------------------
-# Grille — IGN WCS parallélisé + fallback Open-Elevation batch
+# Grille — IGN Altimétrie REST batch + fallback Open-Elevation
 # ---------------------------------------------------------------------------
-
-def _fetch_ign_for_grid(args):
-    """Worker pour ThreadPoolExecutor."""
-    clat, clon, is_padding = args
-    result = _fetch_from_ign_wcs(clat, clon)
-    if result:
-        result.is_padding = is_padding
-    return (clat, clon, result)
-
 
 def get_terrain_grid(
     lat_min: float, lon_min: float,
@@ -282,6 +249,7 @@ def get_terrain_grid(
 
     delta_lat = resolution_m / 111_000
     delta_lon = resolution_m / (111_000 * math.cos(math.radians((lat_min + lat_max) / 2)))
+    delta_elev = 0.001  # ~100m pour voisinage Horn
 
     # Construire la liste des centres
     centers = []
@@ -296,58 +264,7 @@ def get_terrain_grid(
             lon += delta_lon
         lat += delta_lat
 
-    # -----------------------------------------------------------------------
-    # Tentative IGN WCS : tester 1 point d'abord
-    # -----------------------------------------------------------------------
-    test_lat, test_lon, _ = centers[len(centers) // 2]
-    test_result = _fetch_from_ign_wcs(test_lat, test_lon)
-    use_ign = test_result is not None
-    print(f"[terrain] source: {'IGN WCS (parallèle)' if use_ign else 'Open-Elevation (batch)'}")
-
-    if use_ign:
-        # Requêtes IGN WCS parallèles (10 threads)
-        results_map = {}
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(_fetch_ign_for_grid, args): args for args in centers}
-            for future in as_completed(futures):
-                clat, clon, tp = future.result()
-                if tp is not None:
-                    results_map[(clat, clon)] = tp
-
-        # Construire la liste finale dans l'ordre des centres
-        points = []
-        fallback_centers = []
-        for clat, clon, is_padding in centers:
-            tp = results_map.get((clat, clon))
-            if tp:
-                points.append(tp)
-            else:
-                fallback_centers.append((clat, clon, is_padding))
-
-        if fallback_centers:
-            print(f"[terrain] IGN WCS : {len(fallback_centers)} points en fallback Open-Elevation")
-            fallback_pts = _open_elevation_batch(fallback_centers, delta_lat)
-            points.extend(fallback_pts)
-
-        # Remettre dans l'ordre lat/lon
-        order = {(clat, clon): i for i, (clat, clon, _) in enumerate(centers)}
-        points.sort(key=lambda p: order.get((p.lat, p.lon), 9999))
-        return points
-
-    else:
-        # Fallback complet Open-Elevation batch
-        return _open_elevation_batch(centers, delta_lat)
-
-
-def _open_elevation_batch(
-    centers: list,
-    delta_lat: float,
-) -> List[TerrainPoint]:
-    """Requête batch Open-Elevation pour une liste de centres (clat, clon, is_padding)."""
-    import numpy as np
-
-    delta_elev = 0.001  # ~100m pour voisinage Horn
-
+    # Construire tous les points à interroger (centre + 8 voisins)
     all_locations = []
     for (clat, clon, _) in centers:
         for dy in (1, 0, -1):
@@ -357,21 +274,20 @@ def _open_elevation_batch(
                     "longitude": round(clon + dx * delta_elev, 6),
                 })
 
-    try:
-        payload = json.dumps({"locations": all_locations}).encode()
-        req = urllib.request.Request(
-            "https://api.open-elevation.com/api/v1/lookup",
-            data=payload,
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = json.loads(resp.read())
-        elevations = [float(r["elevation"]) for r in data["results"]]
-    except Exception as e:
-        print(f"[terrain] Open-Elevation batch failed: {e}")
+    print(f"[terrain] grille: {len(centers)} points, {len(all_locations)} requêtes elevation")
+
+    # Tentative IGN Altimétrie REST
+    elevations = _fetch_elevations_ign(all_locations)
+
+    if elevations is None or len(elevations) != len(all_locations):
+        print("[terrain] fallback Open-Elevation batch")
+        elevations = _fetch_elevations_open_elevation(all_locations)
+
+    if elevations is None or len(elevations) != len(all_locations):
+        print("[terrain] fallback statique")
         elevations = [1500.0] * len(all_locations)
 
+    # Calculer aspect/slope pour chaque centre
     cell_m = delta_elev * 111_000
     points = []
     for i, (clat, clon, is_padding) in enumerate(centers):
@@ -381,11 +297,12 @@ def _open_elevation_batch(
         aspect, slope = _compute_aspect_slope(z, cell_m)
         points.append(TerrainPoint(
             lat=clat, lon=clon,
-            elevation_m=elev,
+            elevation_m=float(elev),
             aspect_deg=aspect,
             slope_deg=slope,
             is_padding=is_padding
         ))
+
     return points
 
 

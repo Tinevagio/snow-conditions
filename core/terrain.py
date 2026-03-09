@@ -124,15 +124,11 @@ def _extract_from_geotiff(tiff_path: str, lat: float, lon: float) -> Optional[Te
 
 IGN_ALTI_URL      = "https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json"
 IGN_ALTI_RESOURCE = "ign_rge_alti_wld"
-IGN_ALTI_MAX_PTS  = 5000  # limite de l'API par requête
+IGN_ALTI_CHUNK    = 200  # points par requête GET (limite URL ~8KB)
 
 
-def _fetch_elevations_ign(locations: list) -> Optional[list]:
-    """
-    Batch IGN altimétrie REST — tous les points en une seule requête GET.
-    locations : liste de dicts {"latitude": y, "longitude": x}
-    Retourne liste de floats ou None si erreur.
-    """
+def _fetch_elevations_ign_chunk(locations: list) -> Optional[list]:
+    """Requête IGN pour un chunk de points (max IGN_ALTI_CHUNK)."""
     lons = "|".join(str(p["longitude"]) for p in locations)
     lats = "|".join(str(p["latitude"])  for p in locations)
     url  = (f"{IGN_ALTI_URL}?lon={lons}&lat={lats}"
@@ -141,12 +137,27 @@ def _fetch_elevations_ign(locations: list) -> Optional[list]:
         req = urllib.request.Request(url, headers={"User-Agent": "snow-conditions/1.0"})
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-        elevations = [float(z) for z in data["elevations"]]
-        print(f"[terrain] IGN Altimétrie REST OK — {len(elevations)} points")
-        return elevations
+        return [float(z) for z in data["elevations"]]
     except Exception as e:
-        print(f"[terrain] IGN Altimétrie REST erreur: {type(e).__name__}: {e}")
+        print(f"[terrain] IGN chunk erreur: {type(e).__name__}: {e}")
         return None
+
+
+def _fetch_elevations_ign(locations: list) -> Optional[list]:
+    """
+    Batch IGN altimétrie REST avec chunking automatique (200 pts/requête).
+    locations : liste de dicts {"latitude": y, "longitude": x}
+    Retourne liste de floats ou None si erreur sur un chunk.
+    """
+    all_elevs = []
+    for i in range(0, len(locations), IGN_ALTI_CHUNK):
+        chunk = locations[i:i + IGN_ALTI_CHUNK]
+        result = _fetch_elevations_ign_chunk(chunk)
+        if result is None:
+            return None
+        all_elevs.extend(result)
+    print(f"[terrain] IGN Altimétrie REST OK — {len(all_elevs)} points")
+    return all_elevs
 
 
 def _fetch_elevation_ign_single(lat: float, lon: float) -> Optional[float]:

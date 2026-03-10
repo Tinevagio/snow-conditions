@@ -215,6 +215,7 @@ class BeraCorrector:
                 sys.path.insert(0, os.path.dirname(__file__))
                 from massif_locator import MassifLocator
             except ImportError:
+                print("❌ massif_locator introuvable dans sys.path:", sys.path)
                 logger.error("massif_locator.py introuvable")
                 return None
 

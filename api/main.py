@@ -80,6 +80,7 @@ try:
     logger.info("✅ BeraCorrector initialisé")
 except Exception as e:
     _bera_corrector = None
+    print(f"❌ BeraCorrector ERREUR: {e}")
     logger.warning(f"⚠️  BeraCorrector indisponible, correction BERA désactivée : {e}")
 
 

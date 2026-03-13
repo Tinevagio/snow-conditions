@@ -262,19 +262,25 @@ def get_terrain_grid(
     delta_lon = resolution_m / (111_000 * math.cos(math.radians((lat_min + lat_max) / 2)))
     delta_elev = 0.001  # ~100m pour voisinage Horn
 
-    # Construire la liste des centres
+    # Construire la liste des centres via indices entiers (évite l'accumulation d'erreurs flottantes)
+    n_lat = math.ceil((lat_max_ext - lat_min_ext) / delta_lat) + 1
+    n_lon = math.ceil((lon_max_ext - lon_min_ext) / delta_lon) + 1
     centers = []
-    lat = lat_min_ext
-    while lat <= lat_max_ext + 1e-9:
-        lon = lon_min_ext
-        while lon <= lon_max_ext + 1e-9:
-            clat = round(lat, 6)
-            clon = round(lon, 6)
-            tol = 1e-6
-            is_padding = not (lat_min - tol <= clat <= lat_max + tol and lon_min - tol <= clon <= lon_max + tol)
+    for i_lat in range(n_lat):
+        clat = round(lat_min_ext + i_lat * delta_lat, 6)
+        if clat > lat_max_ext + 1e-9:
+            break
+        for i_lon in range(n_lon):
+            clon = round(lon_min_ext + i_lon * delta_lon, 6)
+            if clon > lon_max_ext + 1e-9:
+                break
+            tol_lat = delta_lat * 0.1
+            tol_lon = delta_lon * 0.1
+            is_padding = not (
+                lat_min - tol_lat <= clat <= lat_max + tol_lat and
+                lon_min - tol_lon <= clon <= lon_max + tol_lon
+            )
             centers.append((clat, clon, is_padding))
-            lon += delta_lon
-        lat += delta_lat
 
     # Construire tous les points à interroger (centre + 8 voisins)
     all_locations = []

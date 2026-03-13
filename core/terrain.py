@@ -270,7 +270,8 @@ def get_terrain_grid(
         while lon <= lon_max_ext + 1e-9:
             clat = round(lat, 6)
             clon = round(lon, 6)
-            is_padding = not (lat_min <= clat <= lat_max and lon_min <= clon <= lon_max)
+            tol = 1e-6
+            is_padding = not (lat_min - tol <= clat <= lat_max + tol and lon_min - tol <= clon <= lon_max + tol)
             centers.append((clat, clon, is_padding))
             lon += delta_lon
         lat += delta_lat

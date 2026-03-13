@@ -161,6 +161,7 @@ class PointConditions(BaseModel):
     aspect_deg:   float
     aspect_label: str
     slope_deg:    float
+    bera:         Optional[BeraInfo] = None 
     hours:        List[HourlyCondition]
 
 class ConditionsResponse(BaseModel):
@@ -189,6 +190,20 @@ class HealthResponse(BaseModel):
     status:    str
     version:   str
     timestamp: str
+
+class BeraSnowLevel(BaseModel):
+    alti:  int
+    N_cm:  Optional[int]
+    S_cm:  Optional[int]
+
+class BeraInfo(BaseModel):
+    massif_name:       Optional[str]
+    bera_date:         Optional[str]
+    limite_nord_m:     Optional[int]
+    limite_sud_m:      Optional[int]
+    bera_72h_cm:       Optional[float]
+    bera_24h_cm:       Optional[float]
+    enneigement_niveaux: Optional[List[BeraSnowLevel]]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -243,6 +258,28 @@ def _group_results_by_point(
         terrain = terrain_map.get(key)
         hours_data = sorted(by_point.get(key, []), key=lambda r: r.hour)
 
+        # ── Infos BERA pour ce point ──────────────────────────────────────────
+        bera_info = None
+        if _bera_corrector is not None and terrain is not None:
+            try:
+                raw = _bera_corrector.get_massif_info(terrain.lat, terrain.lon)
+                if raw:
+                    niveaux = [
+                        BeraSnowLevel(alti=n["alti"], N_cm=n.get("N_cm"), S_cm=n.get("S_cm"))
+                        for n in raw.get("enneigement_niveaux", [])
+                    ]
+                    bera_info = BeraInfo(
+                        massif_name=raw.get("massif_name"),
+                        bera_date=raw.get("bera_date"),
+                        limite_nord_m=raw.get("limite_nord_m"),
+                        limite_sud_m=raw.get("limite_sud_m"),
+                        bera_72h_cm=raw.get("bera_72h_cm"),
+                        bera_24h_cm=raw.get("bera_24h_cm"),
+                        enneigement_niveaux=niveaux,
+                    )
+            except Exception as e:
+                logger.warning(f"BeraInfo error ({gp.lat},{gp.lon}): {e}")
+
         output.append(PointConditions(
             lat=gp.lat,
             lon=gp.lon,
@@ -250,6 +287,7 @@ def _group_results_by_point(
             aspect_deg=terrain.aspect_deg   if terrain else gp.aspect,
             aspect_label=terrain.aspect_label() if terrain else "?",
             slope_deg=terrain.slope_deg     if terrain else gp.slope,
+            bera=bera_info,
             hours=[_result_to_hourly(r) for r in hours_data],
         ))
 

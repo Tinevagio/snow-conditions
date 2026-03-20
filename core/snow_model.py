@@ -18,7 +18,7 @@ from .solar_radiation import effective_radiation
 # PARAMÈTRE DE CALIBRATION GLOBAL
 # ---------------------------------------------------------------------------
 
-TEMP_BIAS: float = 1.0
+TEMP_BIAS: float = 0.0
 """
 Décalage de température (°C) appliqué à tous les seuils de classification.
 
@@ -239,7 +239,10 @@ def classify_snow_condition(
     # DÉFAUT
     # ------------------------------------------------------------------
     if temp_surface < THR_DEFAULT_COLD:
-        return SnowCondition.POWDER_COLD, temp_surface
+        if weather.hours_above_zero_last_48h >= 2 or fresh_snow < 5:
+            return SnowCondition.OLD_PACKED, temp_surface  # vieille neige regelée
+        else:
+            return SnowCondition.POWDER_COLD, temp_surface  # fraîche et jamais en redoux
     elif temp_surface <= 0:
         return SnowCondition.OLD_PACKED, temp_surface
     else:

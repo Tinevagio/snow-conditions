@@ -14,6 +14,23 @@ import math
 from .solar_radiation import effective_radiation
 
 
+# ---------------------------------------------------------------------------
+# PARAMÈTRE DE CALIBRATION GLOBAL
+# ---------------------------------------------------------------------------
+
+TEMP_BIAS: float = 1.0
+"""
+Décalage de température (°C) appliqué à tous les seuils de classification.
+
+    +1.0  → poudre plus accessible, moquette plus exigeante
+    -1.0  → poudre plus rare, moquette plus facile
+    0.0   → comportement par défaut
+
+Modifier uniquement ce paramètre pour recalibrer l'ensemble du modèle.
+Valeurs typiques à tester : -2.0, -1.5, -1.0, -0.5, 0.0, +0.5, +1.0, +1.5, +2.0
+"""
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -160,22 +177,27 @@ def classify_snow_condition(
     """
     temp_surface = compute_surface_temperature(point, weather, month, day)
     fresh_snow   = weather.snowfall_last_72h
-    
+
+    # Seuils décalés par TEMP_BIAS (positif = plus favorable à la poudre)
+    THR_WET_HIGH    =  5.0 - TEMP_BIAS   # au-dessus → neige humide
+    THR_POWDER_COLD = -3.0 + TEMP_BIAS   # en-dessous → poudre froide
+    THR_POWDER_WARM_LO = -3.0 + TEMP_BIAS  # borne basse poudre réchauffée
+    THR_POWDER_WARM_HI =  1.0 + TEMP_BIAS  # borne haute poudre réchauffée
+    THR_SPRING_LO   =  0.0 - TEMP_BIAS   # borne basse moquette
+    THR_SPRING_HI   =  5.0 - TEMP_BIAS   # borne haute moquette
+    THR_DEFAULT_COLD = -2.0 + TEMP_BIAS  # seuil défaut froid/vieux
+
     # ------------------------------------------------------------------
     # RÈGLE 0 — PAS DE NEIGE
-    # En dessous du seuil d'enneigement climatologique pour les Alpes
     # ------------------------------------------------------------------
-    snow_line = max(800, 1800 - (month - 1) * 80)  # ~1800m en janvier, ~1100m en juin
+    snow_line = max(800, 1800 - (month - 1) * 80)
     if (point.elevation < snow_line
             and weather.snowfall_last_72h == 0
             and temp_surface > 2):
         return SnowCondition.NO_SNOW, temp_surface
-    
-    
 
     # ------------------------------------------------------------------
     # RÈGLE 1 — CROÛTE DE REGEL
-    # Nuit froide après période de redoux → surface gelée dure
     # ------------------------------------------------------------------
     if (weather.hours_below_minus2_last_12h >= 4
             and weather.hours_above_zero_last_48h >= 2
@@ -184,44 +206,39 @@ def classify_snow_condition(
 
     # ------------------------------------------------------------------
     # RÈGLE 2 — NEIGE HUMIDE LOURDE
-    # Surface trop chaude, neige détrempée
     # ------------------------------------------------------------------
-    if (temp_surface > 5
+    if (temp_surface > THR_WET_HIGH
             and weather.hours_above_zero_last_48h >= 6):
         return SnowCondition.WET_HEAVY, temp_surface
 
     # ------------------------------------------------------------------
     # RÈGLE 3 — POUDRE FROIDE
-    # Neige fraîche abondante + froid + pas de vent violent
     # ------------------------------------------------------------------
     if (fresh_snow >= 15
-            and temp_surface < -3
+            and temp_surface < THR_POWDER_COLD
             and weather.wind_speed < 30):
         return SnowCondition.POWDER_COLD, temp_surface
 
     # ------------------------------------------------------------------
     # RÈGLE 4 — POUDRE RÉCHAUFFÉE
-    # Neige fraîche mais température de surface modérée
     # ------------------------------------------------------------------
     if (fresh_snow >= 10
-            and -3 <= temp_surface <= 1
+            and THR_POWDER_WARM_LO <= temp_surface <= THR_POWDER_WARM_HI
             and weather.wind_speed < 35):
         return SnowCondition.POWDER_WARM, temp_surface
 
     # ------------------------------------------------------------------
     # RÈGLE 5 — NEIGE DE PRINTEMPS
-    # Neige ancienne, surface positive, transformation en cours
     # ------------------------------------------------------------------
-    
-    if (0 <= temp_surface <= 5.0          # élargi : jusqu'à 3°C
+    if (THR_SPRING_LO <= temp_surface <= THR_SPRING_HI
             and fresh_snow < 10
             and weather.direct_radiation > 50):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------
-    # DÉFAUT — cas non couvert → on choisit selon température
+    # DÉFAUT
     # ------------------------------------------------------------------
-    if temp_surface < -2:
+    if temp_surface < THR_DEFAULT_COLD:
         return SnowCondition.POWDER_COLD, temp_surface
     elif temp_surface <= 0:
         return SnowCondition.OLD_PACKED, temp_surface

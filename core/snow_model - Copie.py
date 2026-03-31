@@ -11,6 +11,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 import math
+from .solar_radiation import effective_radiation
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -23,6 +26,8 @@ class SnowCondition(Enum):
     SPRING_SNOW   = "neige_de_printemps"  # transformée, agréable à skier
     CRUST         = "croute_regel"        # regel nocturne, surface dure
     WET_HEAVY     = "neige_humide"        # détrempée, lourde, dangereuse
+    OLD_PACKED    = "neige_ancienne_tassee" # vieille neige tassée
+    NO_SNOW       = "pas_de_neige"        # pas de neige
 
     def label(self) -> str:
         labels = {
@@ -31,6 +36,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  "Neige de printemps",
             "croute_regel":        "Croûte de regel",
             "neige_humide":        "Neige humide lourde",
+            "neige_ancienne_tassee":"Neige ancienne tassée",
+            "pas_de_neige":        "Pas de neige",
         }
         return labels[self.value]
 
@@ -41,6 +48,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  "#F5A623",   # orange
             "croute_regel":        "#D0021B",   # rouge
             "neige_humide":        "#8B572A",   # marron
+            "neige_ancienne_tassee":"#B8D4F0",  #bleu pale
+            "pas_de_neige":        "#c8bfb0",   #beige / gris neutre
         }
         return colors[self.value]
 
@@ -52,6 +61,8 @@ class SnowCondition(Enum):
             "neige_de_printemps":  3,
             "croute_regel":        2,
             "neige_humide":        1,
+            "neige_ancienne_tassee":2,
+            "pas_de_neige":        0,
         }
         return scores[self.value]
 
@@ -78,6 +89,7 @@ class HourlyWeather:
     snowfall_last_72h: float            # cm de neige fraîche sur 72h
     hours_above_zero_last_48h: int      # nb d'heures > 0°C sur les 48h passées
     hours_below_minus2_last_12h: int    # nb d'heures < -2°C sur les 12h passées
+    direct_radiation:float              # radiation solaire
 
 
 @dataclass
@@ -91,6 +103,7 @@ class SnowResult:
     condition: SnowCondition
     temp_surface: float     # température effective en surface (corrigée)
     ski_quality: int        # score 1-5
+    wind_speed: float = 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -109,58 +122,25 @@ def adjust_temperature_for_elevation(
     return temp_ref - (delta_elevation * 0.006)
 
 
-def compute_solar_correction(
-    solar_radiation: float,
-    aspect: float,
-    slope: float
-) -> float:
-    """
-    Traduit le rayonnement solaire en correction de température
-    ressentie en surface du manteau neigeux.
-
-    Simplification MVP : modulation par exposition et pente.
-    Le calcul astronomique complet sera dans solar_radiation.py (V2).
-    """
-    # Facteur d'exposition : cosinus de l'écart au Sud
-    # aspect=180 → facteur=1.0 (plein sud, exposition maximale)
-    # aspect=0   → facteur=-1.0 (plein nord) → borné à 0
-    aspect_rad = math.radians(aspect - 180)
-    exposure_factor = max(0.0, math.cos(aspect_rad))
-
-    # Facteur de pente : une pente à 35° capte plus qu'un terrain plat
-    slope_factor = 1.0 + (slope / 90.0) * 0.3
-
-    # Rayonnement effectif sur ce versant
-    effective_radiation = solar_radiation * exposure_factor * slope_factor
-
-    # Conversion en correction de température ressentie
-    if effective_radiation > 600:   return +5.0
-    if effective_radiation > 400:   return +3.0
-    if effective_radiation > 200:   return +1.5
-    if effective_radiation > 50:    return +0.5
-    return 0.0
 
 
-def compute_surface_temperature(
-    point: GridPoint,
-    weather: HourlyWeather
-) -> float:
-    """
-    Température effective en surface du manteau neigeux pour ce point.
-    = température air corrigée altitude + correction rayonnement solaire
-    """
+def compute_surface_temperature(point, weather, month, day):
     temp_corrected = adjust_temperature_for_elevation(
         weather.temperature_2m,
         point.elevation,
         weather.reference_elevation
     )
-    solar_bonus = compute_solar_correction(
-        weather.shortwave_radiation,
-        point.aspect,
-        point.slope
+    rad = effective_radiation(
+        hour_utc   = weather.hour,
+        lat        = point.lat,
+        lon        = point.lon,
+        month      = month,
+        day        = day,
+        aspect     = point.aspect,
+        slope      = point.slope,
+        altitude_m = point.elevation
     )
-    return temp_corrected + solar_bonus
-
+    return temp_corrected + rad.temperature_correction
 
 # ---------------------------------------------------------------------------
 # RÈGLES PHYSIQUES — CLASSIFIEUR PRINCIPAL
@@ -168,7 +148,9 @@ def compute_surface_temperature(
 
 def classify_snow_condition(
     point: GridPoint,
-    weather: HourlyWeather
+    weather: HourlyWeather,
+    month: int,
+    day: int
 ) -> tuple[SnowCondition, float]:
     """
     Applique les règles physiques et retourne (SnowCondition, temp_surface).
@@ -176,8 +158,20 @@ def classify_snow_condition(
     Ordre des règles : du plus contraignant au plus général.
     La première règle qui matche l'emporte.
     """
-    temp_surface = compute_surface_temperature(point, weather)
+    temp_surface = compute_surface_temperature(point, weather, month, day)
     fresh_snow   = weather.snowfall_last_72h
+    
+    # ------------------------------------------------------------------
+    # RÈGLE 0 — PAS DE NEIGE
+    # En dessous du seuil d'enneigement climatologique pour les Alpes
+    # ------------------------------------------------------------------
+    snow_line = max(800, 1800 - (month - 1) * 80)  # ~1800m en janvier, ~1100m en juin
+    if (point.elevation < snow_line
+            and weather.snowfall_last_72h == 0
+            and temp_surface > 2):
+        return SnowCondition.NO_SNOW, temp_surface
+    
+    
 
     # ------------------------------------------------------------------
     # RÈGLE 1 — CROÛTE DE REGEL
@@ -192,7 +186,7 @@ def classify_snow_condition(
     # RÈGLE 2 — NEIGE HUMIDE LOURDE
     # Surface trop chaude, neige détrempée
     # ------------------------------------------------------------------
-    if (temp_surface > 3
+    if (temp_surface > 5
             and weather.hours_above_zero_last_48h >= 6):
         return SnowCondition.WET_HEAVY, temp_surface
 
@@ -218,9 +212,10 @@ def classify_snow_condition(
     # RÈGLE 5 — NEIGE DE PRINTEMPS
     # Neige ancienne, surface positive, transformation en cours
     # ------------------------------------------------------------------
-    if (temp_surface >= 0
-            and weather.hours_above_zero_last_48h >= 3
-            and fresh_snow < 10):
+    
+    if (0 <= temp_surface <= 5.0          # élargi : jusqu'à 3°C
+            and fresh_snow < 10
+            and weather.direct_radiation > 50):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------
@@ -228,8 +223,10 @@ def classify_snow_condition(
     # ------------------------------------------------------------------
     if temp_surface < -2:
         return SnowCondition.POWDER_COLD, temp_surface
+    elif temp_surface <= 0:
+        return SnowCondition.OLD_PACKED, temp_surface
     else:
-        return SnowCondition.SPRING_SNOW, temp_surface
+        return SnowCondition.WET_HEAVY, temp_surface
 
 
 # ---------------------------------------------------------------------------
@@ -238,7 +235,9 @@ def classify_snow_condition(
 
 def compute_snow_conditions(
     grid_points: List[GridPoint],
-    hourly_weather: List[HourlyWeather]
+    hourly_weather: List[HourlyWeather],
+    month: int,
+    day: int
 ) -> List[SnowResult]:
     """
     Point d'entrée principal du moteur.
@@ -257,7 +256,7 @@ def compute_snow_conditions(
 
     for point in grid_points:
         for weather in hourly_weather:
-            condition, temp_surface = classify_snow_condition(point, weather)
+            condition, temp_surface = classify_snow_condition(point, weather, month, day)
 
             results.append(SnowResult(
                 lat=point.lat,
@@ -267,7 +266,8 @@ def compute_snow_conditions(
                 hour=weather.hour,
                 condition=condition,
                 temp_surface=round(temp_surface, 1),
-                ski_quality=condition.ski_quality()
+                ski_quality=condition.ski_quality(),
+                wind_speed=round(weather.wind_speed, 1)
             ))
 
     return results
@@ -313,14 +313,24 @@ def create_mock_grid(
 # DEMO
 # ---------------------------------------------------------------------------
 
+from datetime import datetime, timezone
+from data.fetchers.openmeteo import get_hourly_weather
+#from snow_model import compute_snow_conditions, create_mock_grid
+today   = datetime.now(timezone.utc)
+grid    = create_mock_grid(45.90, 6.85, 45.95, 6.95)
+weather = get_hourly_weather(45.92, 6.87, target_date=today)
+
+
+
 if __name__ == "__main__":
 
     # Box autour de Chamonix
+    """
     grid = create_mock_grid(
         lat_min=45.90, lon_min=6.85,
         lat_max=45.95, lon_max=6.95,
         resolution_m=500
-    )
+    )"""
     print(f"Grille : {len(grid)} points")
 
     # 3 scénarios horaires représentatifs
@@ -360,7 +370,7 @@ if __name__ == "__main__":
         ),
     ]
 
-    results = compute_snow_conditions(grid, weather_sequence)
+    results = compute_snow_conditions(grid, weather, today.month, today.day)
 
     # Résumé par heure
     for hour in [8, 11, 14]:

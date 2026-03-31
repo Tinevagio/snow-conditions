@@ -1,0 +1,6913 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "massif_id": 3,
+    "massif_name": "Mont-Blanc",
+    "risque_bas": 2,
+    "risque_haut": 3,
+    "n_start_zones": 100,
+    "n_cones": 100
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.750889778137207,
+          45.74015808105469
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2401,
+        "slope_deg": 29.1,
+        "aspect_deg": 31.4,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.7910261154174805,
+          45.754573822021484
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2331,
+        "slope_deg": 33.3,
+        "aspect_deg": 6.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.811741828918457,
+          45.76177978515625
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2658,
+        "slope_deg": 36.1,
+        "aspect_deg": 321.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.807857036590576,
+          45.76808547973633
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3069,
+        "slope_deg": 32.5,
+        "aspect_deg": 316.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.723700046539307,
+          45.773494720458984
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1759,
+        "slope_deg": 38.2,
+        "aspect_deg": 106.8,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.77548885345459,
+          45.77619552612305
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2501,
+        "slope_deg": 30.7,
+        "aspect_deg": 170.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.840226173400879,
+          45.77980041503906
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2648,
+        "slope_deg": 31.3,
+        "aspect_deg": 351.1,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.816921234130859,
+          45.784305572509766
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3025,
+        "slope_deg": 30.7,
+        "aspect_deg": 332.4,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.798793792724609,
+          45.7888069152832
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3299,
+        "slope_deg": 41.5,
+        "aspect_deg": 124.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.8143310546875,
+          45.79241180419922
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3672,
+        "slope_deg": 45.6,
+        "aspect_deg": 17.9,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.739236831665039,
+          45.796016693115234
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1952,
+        "slope_deg": 39.4,
+        "aspect_deg": 134.8,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.855762004852295,
+          45.7987174987793
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2492,
+        "slope_deg": 40.5,
+        "aspect_deg": 27.4,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.763836860656738,
+          45.80232238769531
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2439,
+        "slope_deg": 40.5,
+        "aspect_deg": 138.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.885540962219238,
+          45.805023193359375
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2609,
+        "slope_deg": 34.0,
+        "aspect_deg": 315.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.770309925079346,
+          45.80862808227539
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2737,
+        "slope_deg": 42.3,
+        "aspect_deg": 114.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.779374122619629,
+          45.81133270263672
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3100,
+        "slope_deg": 42.1,
+        "aspect_deg": 105.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.8492889404296875,
+          45.81403350830078
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3104,
+        "slope_deg": 39.2,
+        "aspect_deg": 62.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.806562900543213,
+          45.8176383972168
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3533,
+        "slope_deg": 33.2,
+        "aspect_deg": 179.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.779374122619629,
+          45.82033920288086
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2567,
+        "slope_deg": 38.5,
+        "aspect_deg": 123.9,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.81303596496582,
+          45.822139739990234
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3171,
+        "slope_deg": 50.1,
+        "aspect_deg": 296.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.840226173400879,
+          45.823944091796875
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3239,
+        "slope_deg": 34.3,
+        "aspect_deg": 35.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.747004985809326,
+          45.82664489746094
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1597,
+        "slope_deg": 32.8,
+        "aspect_deg": 23.8,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.798793792724609,
+          45.829349517822266
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2643,
+        "slope_deg": 37.3,
+        "aspect_deg": 57.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.855762004852295,
+          45.83205032348633
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 4340,
+        "slope_deg": 43.4,
+        "aspect_deg": 64.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.846699237823486,
+          45.834754943847656
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3928,
+        "slope_deg": 43.3,
+        "aspect_deg": 66.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.924383163452148,
+          45.83655548095703
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2892,
+        "slope_deg": 33.9,
+        "aspect_deg": 324.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.784552097320557,
+          45.83926010131836
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2479,
+        "slope_deg": 35.1,
+        "aspect_deg": 58.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.81303596496582,
+          45.841060638427734
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3391,
+        "slope_deg": 43.0,
+        "aspect_deg": 163.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.863531112670898,
+          45.84286117553711
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 4051,
+        "slope_deg": 38.2,
+        "aspect_deg": 114.9,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.952867031097412,
+          45.84466552734375
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2647,
+        "slope_deg": 36.7,
+        "aspect_deg": 294.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.982645034790039,
+          45.846466064453125
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2258,
+        "slope_deg": 39.7,
+        "aspect_deg": 346.1,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.772900104522705,
+          45.84916687011719
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2272,
+        "slope_deg": 31.7,
+        "aspect_deg": 112.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.858352184295654,
+          45.85097122192383
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3743,
+        "slope_deg": 29.4,
+        "aspect_deg": 199.9,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.963223934173584,
+          45.8527717590332
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3121,
+        "slope_deg": 49.1,
+        "aspect_deg": 45.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.762541770935059,
+          45.85547637939453
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1842,
+        "slope_deg": 50.4,
+        "aspect_deg": 165.6,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.831162929534912,
+          45.857276916503906
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3464,
+        "slope_deg": 51.7,
+        "aspect_deg": 159.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.885540962219238,
+          45.85907745361328
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 4088,
+        "slope_deg": 38.5,
+        "aspect_deg": 153.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.965814113616943,
+          45.86088180541992
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3390,
+        "slope_deg": 40.1,
+        "aspect_deg": 328.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.833752155303955,
+          45.863582611083984
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2790,
+        "slope_deg": 48.1,
+        "aspect_deg": 157.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.877772808074951,
+          45.86538314819336
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3372,
+        "slope_deg": 43.3,
+        "aspect_deg": 176.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.942509174346924,
+          45.8671875
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3288,
+        "slope_deg": 46.2,
+        "aspect_deg": 179.1,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.948981761932373,
+          45.868988037109375
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3187,
+        "slope_deg": 42.7,
+        "aspect_deg": 233.4,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.93474006652832,
+          45.87078857421875
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2952,
+        "slope_deg": 47.5,
+        "aspect_deg": 129.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.973581790924072,
+          45.87259292602539
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3298,
+        "slope_deg": 45.7,
+        "aspect_deg": 192.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.833752155303955,
+          45.87529373168945
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2085,
+        "slope_deg": 47.1,
+        "aspect_deg": 94.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.802679061889648,
+          45.87799835205078
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1623,
+        "slope_deg": 32.2,
+        "aspect_deg": 161.9,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.999476909637451,
+          45.879798889160156
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3442,
+        "slope_deg": 36.0,
+        "aspect_deg": 91.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.835046768188477,
+          45.882503509521484
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1882,
+        "slope_deg": 39.7,
+        "aspect_deg": 194.8,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.893309116363525,
+          45.88430404663086
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3124,
+        "slope_deg": 52.2,
+        "aspect_deg": 169.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.954161167144775,
+          45.886104583740234
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2847,
+        "slope_deg": 48.6,
+        "aspect_deg": 82.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.004654884338379,
+          45.88790512084961
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3486,
+        "slope_deg": 56.8,
+        "aspect_deg": 86.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.0318450927734375,
+          45.88970947265625
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2474,
+        "slope_deg": 35.9,
+        "aspect_deg": 255.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.044792175292969,
+          45.891510009765625
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2432,
+        "slope_deg": 44.2,
+        "aspect_deg": 36.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.929562091827393,
+          45.89421463012695
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2334,
+        "slope_deg": 39.2,
+        "aspect_deg": 262.9,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.7495951652526855,
+          45.896915435791016
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1885,
+        "slope_deg": 32.1,
+        "aspect_deg": 157.4,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.0473809242248535,
+          45.898719787597656
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2796,
+        "slope_deg": 37.7,
+        "aspect_deg": 246.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.932150840759277,
+          45.902320861816406
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2350,
+        "slope_deg": 40.8,
+        "aspect_deg": 287.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.951571941375732,
+          45.905025482177734
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2145,
+        "slope_deg": 33.9,
+        "aspect_deg": 51.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.870004177093506,
+          45.908626556396484
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1459,
+        "slope_deg": 34.3,
+        "aspect_deg": 152.4,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.954161167144775,
+          45.91133117675781
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2553,
+        "slope_deg": 46.0,
+        "aspect_deg": 81.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.890719890594482,
+          45.91493225097656
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1780,
+        "slope_deg": 35.9,
+        "aspect_deg": 82.6,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.070685863494873,
+          45.91763687133789
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2481,
+        "slope_deg": 31.4,
+        "aspect_deg": 270.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.983940124511719,
+          45.921241760253906
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3036,
+        "slope_deg": 31.5,
+        "aspect_deg": 347.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.893309116363525,
+          45.92394256591797
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1595,
+        "slope_deg": 39.9,
+        "aspect_deg": 112.3,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.012423992156982,
+          45.925743103027344
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3287,
+        "slope_deg": 45.9,
+        "aspect_deg": 218.1,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.951571941375732,
+          45.92844772338867
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3124,
+        "slope_deg": 57.6,
+        "aspect_deg": 348.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.015013217926025,
+          45.93024826049805
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2919,
+        "slope_deg": 29.5,
+        "aspect_deg": 214.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.928267002105713,
+          45.932952880859375
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1831,
+        "slope_deg": 41.6,
+        "aspect_deg": 81.2,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.070685863494873,
+          45.93475341796875
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2105,
+        "slope_deg": 45.6,
+        "aspect_deg": 237.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.930856227874756,
+          45.938358306884766
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2017,
+        "slope_deg": 29.3,
+        "aspect_deg": 100.1,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.943802833557129,
+          45.941959381103516
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2440,
+        "slope_deg": 32.8,
+        "aspect_deg": 40.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.9593400955200195,
+          45.944664001464844
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3250,
+        "slope_deg": 35.3,
+        "aspect_deg": 88.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.088812828063965,
+          45.94736862182617
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2103,
+        "slope_deg": 40.6,
+        "aspect_deg": 250.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.039612770080566,
+          45.95096969604492
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3566,
+        "slope_deg": 40.3,
+        "aspect_deg": 257.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.038318157196045,
+          45.95457458496094
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3554,
+        "slope_deg": 44.5,
+        "aspect_deg": 236.4,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.005949974060059,
+          45.95817565917969
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3234,
+        "slope_deg": 40.7,
+        "aspect_deg": 141.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.022781848907471,
+          45.9617805480957
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3391,
+        "slope_deg": 57.5,
+        "aspect_deg": 214.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.073276042938232,
+          45.96538543701172
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2862,
+        "slope_deg": 37.4,
+        "aspect_deg": 329.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.084928035736084,
+          45.96898651123047
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2400,
+        "slope_deg": 32.8,
+        "aspect_deg": 318.5,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.003361225128174,
+          45.972591400146484
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3290,
+        "slope_deg": 39.6,
+        "aspect_deg": 180.6,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.091402053833008,
+          45.9761962890625
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2173,
+        "slope_deg": 36.0,
+        "aspect_deg": 225.0,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.087518215179443,
+          45.97979736328125
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2167,
+        "slope_deg": 50.4,
+        "aspect_deg": 218.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.9593400955200195,
+          45.98430252075195
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2300,
+        "slope_deg": 40.1,
+        "aspect_deg": 13.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.952867031097412,
+          45.989707946777344
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2064,
+        "slope_deg": 29.0,
+        "aspect_deg": 160.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.051266193389893,
+          45.99421310424805
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 3006,
+        "slope_deg": 36.8,
+        "aspect_deg": 190.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.087518215179443,
+          45.99781799316406
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2380,
+        "slope_deg": 41.7,
+        "aspect_deg": 6.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.960635185241699,
+          46.00412368774414
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1741,
+        "slope_deg": 37.1,
+        "aspect_deg": 51.2,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.0616230964660645,
+          46.0068244934082
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2901,
+        "slope_deg": 40.6,
+        "aspect_deg": 162.7,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.1082329750061035,
+          46.00952911376953
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1734,
+        "slope_deg": 32.0,
+        "aspect_deg": 169.5,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.017602920532227,
+          46.01313018798828
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2516,
+        "slope_deg": 35.8,
+        "aspect_deg": 219.3,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.008540153503418,
+          46.0167350769043
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2304,
+        "slope_deg": 30.5,
+        "aspect_deg": 216.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.105644226074219,
+          46.02033996582031
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2053,
+        "slope_deg": 33.0,
+        "aspect_deg": 311.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.060328960418701,
+          46.024845123291016
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2431,
+        "slope_deg": 31.0,
+        "aspect_deg": 302.2,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.044792175292969,
+          46.028446197509766
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2542,
+        "slope_deg": 40.5,
+        "aspect_deg": 250.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.088812828063965,
+          46.03205108642578
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1773,
+        "slope_deg": 40.3,
+        "aspect_deg": 322.3,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.049971103668213,
+          46.0356559753418
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 2166,
+        "slope_deg": 37.9,
+        "aspect_deg": 214.8,
+        "risque": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.051266193389893,
+          46.03926086425781
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1934,
+        "slope_deg": 35.6,
+        "aspect_deg": 260.6,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.052559852600098,
+          46.04466247558594
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1783,
+        "slope_deg": 34.1,
+        "aspect_deg": 281.1,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.999476909637451,
+          46.05006790161133
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1494,
+        "slope_deg": 34.7,
+        "aspect_deg": 96.7,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.976171970367432,
+          46.059078216552734
+        ]
+      },
+      "properties": {
+        "type": "start_zone",
+        "elevation": 1780,
+        "slope_deg": 32.1,
+        "aspect_deg": 128.1,
+        "risque": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.750889778137207,
+              45.74015808105469
+            ],
+            [
+              6.748956930706007,
+              45.7358603064047
+            ],
+            [
+              6.7483652366494695,
+              45.736012453421736
+            ],
+            [
+              6.747797639846433,
+              45.73620417128381
+            ],
+            [
+              6.747259558121922,
+              45.736433630005564
+            ],
+            [
+              6.746756127573633,
+              45.73669863935761
+            ],
+            [
+              6.746292153546853,
+              45.73699666977267
+            ],
+            [
+              6.750889778137207,
+              45.74015808105469
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.74015808105469,
+        "start_lon": 6.750889778137207,
+        "elevation": 2401,
+        "slope_deg": 29.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.7910261154174805,
+              45.754573822021484
+            ],
+            [
+              6.791867066301824,
+              45.75010769683079
+            ],
+            [
+              6.791238433800586,
+              45.75007175417469
+            ],
+            [
+              6.790607774677909,
+              45.75007878465677
+            ],
+            [
+              6.789981108701275,
+              45.75012872116966
+            ],
+            [
+              6.789364417522786,
+              45.750221087059366
+            ],
+            [
+              6.788763587583102,
+              45.75035500067499
+            ],
+            [
+              6.7910261154174805,
+              45.754573822021484
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.754573822021484,
+        "start_lon": 6.7910261154174805,
+        "elevation": 2331,
+        "slope_deg": 33.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.811741828918457,
+              45.76177978515625
+            ],
+            [
+              6.816848211296703,
+              45.7590230419286
+            ],
+            [
+              6.8164382408781155,
+              45.75868856623646
+            ],
+            [
+              6.81598344226792,
+              45.75838359684726
+            ],
+            [
+              6.815488156609827,
+              45.758111044754834
+            ],
+            [
+              6.814957111504518,
+              45.75787351152342
+            ],
+            [
+              6.814395375883752,
+              45.75767326445523
+            ],
+            [
+              6.811741828918457,
+              45.76177978515625
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.76177978515625,
+        "start_lon": 6.811741828918457,
+        "elevation": 2658,
+        "slope_deg": 36.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.807857036590576,
+              45.76808547973633
+            ],
+            [
+              6.813285459930105,
+              45.76564587784153
+            ],
+            [
+              6.812918274136507,
+              45.76528800641184
+            ],
+            [
+              6.812502777818102,
+              45.764956837424634
+            ],
+            [
+              6.8120429369703634,
+              45.76465553195413
+            ],
+            [
+              6.811543140866167,
+              45.76438696602133
+            ],
+            [
+              6.8110081601593055,
+              45.764153703141766
+            ],
+            [
+              6.807857036590576,
+              45.76808547973633
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.76808547973633,
+        "start_lon": 6.807857036590576,
+        "elevation": 3069,
+        "slope_deg": 32.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.723700046539307,
+              45.773494720458984
+            ],
+            [
+              6.719844816407006,
+              45.773766429984896
+            ],
+            [
+              6.719886064589448,
+              45.773971927438446
+            ],
+            [
+              6.719949794271507,
+              45.77417461199757
+            ],
+            [
+              6.720035629798856,
+              45.77437328893905
+            ],
+            [
+              6.72014306521436,
+              45.77456678716255
+            ],
+            [
+              6.720271467240442,
+              45.77475396609363
+            ],
+            [
+              6.723700046539307,
+              45.773494720458984
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.773494720458984,
+        "start_lon": 6.723700046539307,
+        "elevation": 1759,
+        "slope_deg": 38.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.77548885345459,
+              45.77619552612305
+            ],
+            [
+              6.7728927918594115,
+              45.78032009681327
+            ],
+            [
+              6.773482255630267,
+              45.780477101012096
+            ],
+            [
+              6.774090872778748,
+              45.78059323672214
+            ],
+            [
+              6.774712833932427,
+              45.78066739540482
+            ],
+            [
+              6.7753422023476775,
+              45.780698869200656
+            ],
+            [
+              6.7759729705770795,
+              45.78068735768599
+            ],
+            [
+              6.77548885345459,
+              45.77619552612305
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.77619552612305,
+        "start_lon": 6.77548885345459,
+        "elevation": 2501,
+        "slope_deg": 30.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.840226173400879,
+              45.77980041503906
+            ],
+            [
+              6.842741414188671,
+              45.775651507300694
+            ],
+            [
+              6.842148893587714,
+              45.77550013102041
+            ],
+            [
+              6.841538020237959,
+              45.77538980181129
+            ],
+            [
+              6.840914625047728,
+              45.77532157278772
+            ],
+            [
+              6.8402846584488115,
+              45.77529609520936
+            ],
+            [
+              6.839654133598414,
+              45.77531361226481
+            ],
+            [
+              6.840226173400879,
+              45.77980041503906
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.77980041503906,
+        "start_lon": 6.840226173400879,
+        "elevation": 2648,
+        "slope_deg": 31.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.816921234130859,
+              45.784305572509766
+            ],
+            [
+              6.821210018652086,
+              45.7809372674791
+            ],
+            [
+              6.820718217706383,
+              45.78066148889463
+            ],
+            [
+              6.820190173792916,
+              45.78042049381722
+            ],
+            [
+              6.819630927196469,
+              45.78021658259308
+            ],
+            [
+              6.819045816037673,
+              45.78005170159564
+            ],
+            [
+              6.818440425319583,
+              45.779927424647
+            ],
+            [
+              6.816921234130859,
+              45.784305572509766
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.784305572509766,
+        "start_lon": 6.816921234130859,
+        "elevation": 3025,
+        "slope_deg": 30.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.798793792724609,
+              45.7888069152832
+            ],
+            [
+              6.792735051469199,
+              45.79036950869413
+            ],
+            [
+              6.7929826412621654,
+              45.79077431845982
+            ],
+            [
+              6.793285699658282,
+              45.79116034896864
+            ],
+            [
+              6.793641333904536,
+              45.791523915482166
+            ],
+            [
+              6.794046149400907,
+              45.791861547685286
+            ],
+            [
+              6.794496282102504,
+              45.79217002281109
+            ],
+            [
+              6.798793792724609,
+              45.7888069152832
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.7888069152832,
+        "start_lon": 6.798793792724609,
+        "elevation": 3299,
+        "slope_deg": 41.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.8143310546875,
+              45.79241180419922
+            ],
+            [
+              6.813889348835433,
+              45.787917840827724
+            ],
+            [
+              6.813262518003114,
+              45.78796934267374
+            ],
+            [
+              6.812645886567193,
+              45.78806324870368
+            ],
+            [
+              6.812045340398075,
+              45.788198662565684
+            ],
+            [
+              6.811466611829076,
+              45.78837429170737
+            ],
+            [
+              6.810915224940153,
+              45.78858845971344
+            ],
+            [
+              6.8143310546875,
+              45.79241180419922
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.79241180419922,
+        "start_lon": 6.8143310546875,
+        "elevation": 3672,
+        "slope_deg": 45.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.739236831665039,
+              45.796016693115234
+            ],
+            [
+              6.736014279381625,
+              45.797518838087164
+            ],
+            [
+              6.736189067679307,
+              45.79768678409636
+            ],
+            [
+              6.736381821008228,
+              45.797844885761705
+            ],
+            [
+              6.736591403184749,
+              45.79799221115364
+            ],
+            [
+              6.736816578827666,
+              45.798127891863295
+            ],
+            [
+              6.7370560206401535,
+              45.798251128121336
+            ],
+            [
+              6.739236831665039,
+              45.796016693115234
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.796016693115234,
+        "start_lon": 6.739236831665039,
+        "elevation": 1952,
+        "slope_deg": 39.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.855762004852295,
+              45.7987174987793
+            ],
+            [
+              6.854262127722574,
+              45.79433604907734
+            ],
+            [
+              6.853656024235984,
+              45.794459001062435
+            ],
+            [
+              6.853070022755649,
+              45.794622601260095
+            ],
+            [
+              6.8525097167829205,
+              45.7948252880737
+            ],
+            [
+              6.85198045455039,
+              45.79506512681708
+            ],
+            [
+              6.851487287971939,
+              45.79533982818145
+            ],
+            [
+              6.855762004852295,
+              45.7987174987793
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.7987174987793,
+        "start_lon": 6.855762004852295,
+        "elevation": 2492,
+        "slope_deg": 40.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.763836860656738,
+              45.80232238769531
+            ],
+            [
+              6.7585163333650105,
+              45.8048783426034
+            ],
+            [
+              6.758899500602445,
+              45.80522809184525
+            ],
+            [
+              6.759329795929251,
+              45.805550105559746
+            ],
+            [
+              6.759803112090457,
+              45.80584131006156
+            ],
+            [
+              6.760314931188624,
+              45.80609892574548
+            ],
+            [
+              6.760860367808078,
+              45.806320493618266
+            ],
+            [
+              6.763836860656738,
+              45.80232238769531
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.80232238769531,
+        "start_lon": 6.763836860656738,
+        "elevation": 2439,
+        "slope_deg": 40.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.885540962219238,
+              45.805023193359375
+            ],
+            [
+              6.8910614249061055,
+              45.80268205249718
+            ],
+            [
+              6.8907073565608306,
+              45.80231769492335
+            ],
+            [
+              6.8903039739480985,
+              45.80197916187329
+            ],
+            [
+              6.88985512743564,
+              45.80166968471268
+            ],
+            [
+              6.889365101353199,
+              45.801392217462926
+            ],
+            [
+              6.888838573097759,
+              45.80114940860443
+            ],
+            [
+              6.885540962219238,
+              45.805023193359375
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.805023193359375,
+        "start_lon": 6.885540962219238,
+        "elevation": 2609,
+        "slope_deg": 34.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.770309925079346,
+              45.80862808227539
+            ],
+            [
+              6.763946848906414,
+              45.80941392089481
+            ],
+            [
+              6.764087228981757,
+              45.80984299229379
+            ],
+            [
+              6.764287005936117,
+              45.81026046713362
+            ],
+            [
+              6.764544272858501,
+              45.81066236053343
+            ],
+            [
+              6.764856574084673,
+              45.81104483634034
+            ],
+            [
+              6.765220928636958,
+              45.81140424374627
+            ],
+            [
+              6.770309925079346,
+              45.80862808227539
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.80862808227539,
+        "start_lon": 6.770309925079346,
+        "elevation": 2737,
+        "slope_deg": 42.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.779374122619629,
+              45.81133270263672
+            ],
+            [
+              6.772913305226554,
+              45.81143511334948
+            ],
+            [
+              6.772958477570546,
+              45.811874073578565
+            ],
+            [
+              6.773064888529892,
+              45.812307866313716
+            ],
+            [
+              6.773231522390702,
+              45.8127323509165
+            ],
+            [
+              6.77345678859944,
+              45.81314347559647
+            ],
+            [
+              6.773738536945083,
+              45.81353731608632
+            ],
+            [
+              6.779374122619629,
+              45.81133270263672
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.81133270263672,
+        "start_lon": 6.779374122619629,
+        "elevation": 3100,
+        "slope_deg": 42.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.8492889404296875,
+              45.81403350830078
+            ],
+            [
+              6.844444553393406,
+              45.81105191519678
+            ],
+            [
+              6.844050231980508,
+              45.81139563252511
+            ],
+            [
+              6.84370591508769,
+              45.81176452890539
+            ],
+            [
+              6.843414889288569,
+              45.81215508314788
+            ],
+            [
+              6.843179932482613,
+              45.8125635673342
+            ],
+            [
+              6.843003287379537,
+              45.812986082401096
+            ],
+            [
+              6.8492889404296875,
+              45.81403350830078
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.81403350830078,
+        "start_lon": 6.8492889404296875,
+        "elevation": 3104,
+        "slope_deg": 39.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.806562900543213,
+              45.8176383972168
+            ],
+            [
+              6.804891489529531,
+              45.82198967453045
+            ],
+            [
+              6.805508712058277,
+              45.82208258004097
+            ],
+            [
+              6.806135997026987,
+              45.82213306493744
+            ],
+            [
+              6.806767356875155,
+              45.822140647331416
+            ],
+            [
+              6.807396765146737,
+              45.82210525484743
+            ],
+            [
+              6.808018214013875,
+              45.82202722531383
+            ],
+            [
+              6.806562900543213,
+              45.8176383972168
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.8176383972168,
+        "start_lon": 6.806562900543213,
+        "elevation": 3533,
+        "slope_deg": 33.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.779374122619629,
+              45.82033920288086
+            ],
+            [
+              6.773294664793309,
+              45.82186883070015
+            ],
+            [
+              6.773537861354675,
+              45.822274973374554
+            ],
+            [
+              6.773836766197278,
+              45.82266263873238
+            ],
+            [
+              6.774188526214605,
+              45.82302812643023
+            ],
+            [
+              6.774589783786927,
+              45.823367947814916
+            ],
+            [
+              6.775036708830447,
+              45.82367885922335
+            ],
+            [
+              6.779374122619629,
+              45.82033920288086
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.82033920288086,
+        "start_lon": 6.779374122619629,
+        "elevation": 2567,
+        "slope_deg": 38.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.81303596496582,
+              45.822139739990234
+            ],
+            [
+              6.819343915906755,
+              45.821156728312324
+            ],
+            [
+              6.81917616274257,
+              45.82073245170117
+            ],
+            [
+              6.818949800162343,
+              45.82032160793823
+            ],
+            [
+              6.8186669888421845,
+              45.81992811860943
+            ],
+            [
+              6.818330428272716,
+              45.81955573964911
+            ],
+            [
+              6.817943330991898,
+              45.81920802548894
+            ],
+            [
+              6.81303596496582,
+              45.822139739990234
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.822139739990234,
+        "start_lon": 6.81303596496582,
+        "elevation": 3171,
+        "slope_deg": 50.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.840226173400879,
+              45.823944091796875
+            ],
+            [
+              6.837876749827493,
+              45.81974766094597
+            ],
+            [
+              6.837300331465352,
+              45.819927454687694
+            ],
+            [
+              6.83675184084976,
+              45.82014558803409
+            ],
+            [
+              6.836236513433362,
+              45.82039997885874
+            ],
+            [
+              6.83575926811943,
+              45.820688198950336
+            ],
+            [
+              6.835324660309953,
+              45.82100749719045
+            ],
+            [
+              6.840226173400879,
+              45.823944091796875
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.823944091796875,
+        "start_lon": 6.840226173400879,
+        "elevation": 3239,
+        "slope_deg": 34.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.747004985809326,
+              45.82664489746094
+            ],
+            [
+              6.746148870062092,
+              45.824008857271245
+            ],
+            [
+              6.7458611732982865,
+              45.824062394493076
+            ],
+            [
+              6.745580218732233,
+              45.82413115426715
+            ],
+            [
+              6.745307662449369,
+              45.82421473128929
+            ],
+            [
+              6.745045111031491,
+              45.824312632915095
+            ],
+            [
+              6.744794112086762,
+              45.82442428206388
+            ],
+            [
+              6.747004985809326,
+              45.82664489746094
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.82664489746094,
+        "start_lon": 6.747004985809326,
+        "elevation": 1597,
+        "slope_deg": 32.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.798793792724609,
+              45.829349517822266
+            ],
+            [
+              6.794339469523158,
+              45.826084978169504
+            ],
+            [
+              6.793903546449451,
+              45.8264034326569
+            ],
+            [
+              6.7935143017546675,
+              45.82675000811652
+            ],
+            [
+              6.793175450857282,
+              45.82712139641628
+            ],
+            [
+              6.792890228156892,
+              45.82751405258057
+            ],
+            [
+              6.792661356161229,
+              45.827924228627744
+            ],
+            [
+              6.798793792724609,
+              45.829349517822266
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.829349517822266,
+        "start_lon": 6.798793792724609,
+        "elevation": 2643,
+        "slope_deg": 37.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.855762004852295,
+              45.83205032348633
+            ],
+            [
+              6.850795655049293,
+              45.82916651082056
+            ],
+            [
+              6.850415474907532,
+              45.829517947393505
+            ],
+            [
+              6.850086328463593,
+              45.82989355600282
+            ],
+            [
+              6.849811357486128,
+              45.8302897513892
+            ],
+            [
+              6.849593186628117,
+              45.83070275178842
+            ],
+            [
+              6.849433898374044,
+              45.831128615029066
+            ],
+            [
+              6.855762004852295,
+              45.83205032348633
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.83205032348633,
+        "start_lon": 6.855762004852295,
+        "elevation": 4340,
+        "slope_deg": 43.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.846699237823486,
+              45.834754943847656
+            ],
+            [
+              6.841592905273201,
+              45.83199214126174
+            ],
+            [
+              6.841230322062161,
+              45.83235250117125
+            ],
+            [
+              6.840919940746045,
+              45.83273579287668
+            ],
+            [
+              6.840664723976602,
+              45.83313835778203
+            ],
+            [
+              6.84046710784895,
+              45.83355635332475
+            ],
+            [
+              6.840328978648557,
+              45.83398578965378
+            ],
+            [
+              6.846699237823486,
+              45.834754943847656
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.834754943847656,
+        "start_lon": 6.846699237823486,
+        "elevation": 3928,
+        "slope_deg": 43.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.924383163452148,
+              45.83655548095703
+            ],
+            [
+              6.92928675643056,
+              45.83361967191502
+            ],
+            [
+              6.9288521555379745,
+              45.83330030403573
+            ],
+            [
+              6.9283748972219685,
+              45.83301200747132
+            ],
+            [
+              6.927859537008638,
+              45.83275753407015
+            ],
+            [
+              6.927310994114309,
+              45.83253931283174
+            ],
+            [
+              6.926734504490638,
+              45.83235942672147
+            ],
+            [
+              6.924383163452148,
+              45.83655548095703
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.83655548095703,
+        "start_lon": 6.924383163452148,
+        "elevation": 2892,
+        "slope_deg": 33.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.784552097320557,
+              45.83926010131836
+            ],
+            [
+              6.780001510405015,
+              45.83606011347421
+            ],
+            [
+              6.779575007089918,
+              45.83638475028765
+            ],
+            [
+              6.779196011096674,
+              45.83673683290185
+            ],
+            [
+              6.778868140017846,
+              45.83711300061783
+            ],
+            [
+              6.778594523448472,
+              45.8375096628395
+            ],
+            [
+              6.778377773113438,
+              45.8379230333466
+            ],
+            [
+              6.784552097320557,
+              45.83926010131836
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.83926010131836,
+        "start_lon": 6.784552097320557,
+        "elevation": 2479,
+        "slope_deg": 35.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.81303596496582,
+              45.841060638427734
+            ],
+            [
+              6.809737519126092,
+              45.84493496058838
+            ],
+            [
+              6.810295954125064,
+              45.84514070243594
+            ],
+            [
+              6.810880543075615,
+              45.84530749925638
+            ],
+            [
+              6.81148570595927,
+              45.845433758940686
+            ],
+            [
+              6.81210566637525,
+              45.84551827631491
+            ],
+            [
+              6.812734506677371,
+              45.84556024464381
+            ],
+            [
+              6.81303596496582,
+              45.841060638427734
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.841060638427734,
+        "start_lon": 6.81303596496582,
+        "elevation": 3391,
+        "slope_deg": 43.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.863531112670898,
+              45.84286117553711
+            ],
+            [
+              6.857181449482095,
+              45.84371233553711
+            ],
+            [
+              6.8573309833562694,
+              45.84413991729732
+            ],
+            [
+              6.857539698705003,
+              45.84455529321163
+            ],
+            [
+              6.857805603298543,
+              45.84495449843384
+            ],
+            [
+              6.8581261590243505,
+              45.84533372247028
+            ],
+            [
+              6.858498306113902,
+              45.845689345551634
+            ],
+            [
+              6.863531112670898,
+              45.84286117553711
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.84286117553711,
+        "start_lon": 6.863531112670898,
+        "elevation": 4051,
+        "slope_deg": 38.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.952867031097412,
+              45.84466552734375
+            ],
+            [
+              6.959230461512926,
+              45.843865021044415
+            ],
+            [
+              6.959087953805959,
+              45.843436275681285
+            ],
+            [
+              6.958886066147328,
+              45.843019263771176
+            ],
+            [
+              6.95862672559512,
+              45.84261796577617
+            ],
+            [
+              6.958312407606783,
+              45.84223621216592
+            ],
+            [
+              6.957946112410391,
+              45.84187764685499
+            ],
+            [
+              6.952867031097412,
+              45.84466552734375
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.84466552734375,
+        "start_lon": 6.952867031097412,
+        "elevation": 2647,
+        "slope_deg": 36.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.982645034790039,
+              45.846466064453125
+            ],
+            [
+              6.985668739317736,
+              45.84248432880989
+            ],
+            [
+              6.985096515490196,
+              45.842297796830294
+            ],
+            [
+              6.984500891788987,
+              45.842151051798965
+            ],
+            [
+              6.983887553561486,
+              45.84204549442658
+            ],
+            [
+              6.9832623552437605,
+              45.84198213227938
+            ],
+            [
+              6.982631264478819,
+              45.841961570161715
+            ],
+            [
+              6.982645034790039,
+              45.846466064453125
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.846466064453125,
+        "start_lon": 6.982645034790039,
+        "elevation": 2258,
+        "slope_deg": 39.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.772900104522705,
+              45.84916687011719
+            ],
+            [
+              6.766496397035381,
+              45.84979496152679
+            ],
+            [
+              6.76661495163461,
+              45.85022723244137
+            ],
+            [
+              6.766793499275415,
+              45.850649381985455
+            ],
+            [
+              6.767030335684847,
+              45.851057380657195
+            ],
+            [
+              6.7673232002120045,
+              45.85144733402767
+            ],
+            [
+              6.767669297406391,
+              45.85181551991394
+            ],
+            [
+              6.772900104522705,
+              45.84916687011719
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.84916687011719,
+        "start_lon": 6.772900104522705,
+        "elevation": 2272,
+        "slope_deg": 31.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.858352184295654,
+              45.85097122192383
+            ],
+            [
+              6.859019861289747,
+              45.85545165545149
+            ],
+            [
+              6.859644379996562,
+              45.85538489071027
+            ],
+            [
+              6.860256564436924,
+              45.855275996617586
+            ],
+            [
+              6.8608505711878935,
+              45.855126012589345
+            ],
+            [
+              6.861420730336208,
+              45.85493637025309
+            ],
+            [
+              6.861961599598746,
+              45.85470887978286
+            ],
+            [
+              6.858352184295654,
+              45.85097122192383
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.85097122192383,
+        "start_lon": 6.858352184295654,
+        "elevation": 3743,
+        "slope_deg": 29.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.963223934173584,
+              45.8527717590332
+            ],
+            [
+              6.959894383860504,
+              45.848910077685396
+            ],
+            [
+              6.959369238395627,
+              45.84915480725599
+            ],
+            [
+              6.9588808867730325,
+              45.84943406135483
+            ],
+            [
+              6.958433990406642,
+              45.84974517444566
+            ],
+            [
+              6.95803281501167,
+              45.85008517689181
+            ],
+            [
+              6.957681189887511,
+              45.85045082330191
+            ],
+            [
+              6.963223934173584,
+              45.8527717590332
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.8527717590332,
+        "start_lon": 6.963223934173584,
+        "elevation": 3121,
+        "slope_deg": 49.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.762541770935059,
+              45.85547637939453
+            ],
+            [
+              6.760874867311494,
+              45.8579170347057
+            ],
+            [
+              6.761148628042592,
+              45.85799890840083
+            ],
+            [
+              6.761430600648265,
+              45.85806591305996
+            ],
+            [
+              6.761719123042244,
+              45.858117653724435
+            ],
+            [
+              6.762012494530564,
+              45.85815382540914
+            ],
+            [
+              6.762308985836293,
+              45.85817421490023
+            ],
+            [
+              6.762541770935059,
+              45.85547637939453
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.85547637939453,
+        "start_lon": 6.762541770935059,
+        "elevation": 1842,
+        "slope_deg": 50.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.831162929534912,
+              45.857276916503906
+            ],
+            [
+              6.827448881632088,
+              45.860964713464256
+            ],
+            [
+              6.8279833233761345,
+              45.86119952506566
+            ],
+            [
+              6.8285481150970035,
+              45.86139689458367
+            ],
+            [
+              6.82913786574474,
+              45.86155493808677
+            ],
+            [
+              6.829746946031441,
+              45.8616721470181
+            ],
+            [
+              6.83036954216393,
+              45.861747402594965
+            ],
+            [
+              6.831162929534912,
+              45.857276916503906
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.857276916503906,
+        "start_lon": 6.831162929534912,
+        "elevation": 3464,
+        "slope_deg": 51.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.885540962219238,
+              45.85907745361328
+            ],
+            [
+              6.881345290508285,
+              45.86250566528477
+            ],
+            [
+              6.88184567458298,
+              45.86277443838926
+            ],
+            [
+              6.8823813309173545,
+              45.86300792303452
+            ],
+            [
+              6.882947146564547,
+              45.86320389056292
+            ],
+            [
+              6.883537720701021,
+              45.8633604704252
+            ],
+            [
+              6.884147416178507,
+              45.863476168035255
+            ],
+            [
+              6.885540962219238,
+              45.85907745361328
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.85907745361328,
+        "start_lon": 6.885540962219238,
+        "elevation": 4088,
+        "slope_deg": 38.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.965814113616943,
+              45.86088180541992
+            ],
+            [
+              6.970427992837958,
+              45.85772484056347
+            ],
+            [
+              6.969963605478931,
+              45.857426362024434
+            ],
+            [
+              6.9694596103900315,
+              45.85716086638383
+            ],
+            [
+              6.968920818305201,
+              45.85693088785064
+            ],
+            [
+              6.968352372102667,
+              45.856738621615975
+            ],
+            [
+              6.9677596977151435,
+              45.85658590289951
+            ],
+            [
+              6.965814113616943,
+              45.86088180541992
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.86088180541992,
+        "start_lon": 6.965814113616943,
+        "elevation": 3390,
+        "slope_deg": 40.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.833752155303955,
+              45.863582611083984
+            ],
+            [
+              6.829855289389215,
+              45.867177972884306
+            ],
+            [
+              6.830377709223643,
+              45.867425620180285
+            ],
+            [
+              6.83093233882092,
+              45.86763658518569
+            ],
+            [
+              6.831513884130593,
+              45.867808854197364
+            ],
+            [
+              6.832116794186351,
+              45.86794078287311
+            ],
+            [
+              6.832735314091109,
+              45.868031111927344
+            ],
+            [
+              6.833752155303955,
+              45.863582611083984
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.863582611083984,
+        "start_lon": 6.833752155303955,
+        "elevation": 2790,
+        "slope_deg": 48.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.877772808074951,
+              45.86538314819336
+            ],
+            [
+              6.875776088571269,
+              45.86966769302299
+            ],
+            [
+              6.876386035121557,
+              45.8697829247199
+            ],
+            [
+              6.877009218697092,
+              45.86985615966974
+            ],
+            [
+              6.8776396908859825,
+              45.86988669883028
+            ],
+            [
+              6.878271433705071,
+              45.86987425069911
+            ],
+            [
+              6.878898417042777,
+              45.869818934096145
+            ],
+            [
+              6.877772808074951,
+              45.86538314819336
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.86538314819336,
+        "start_lon": 6.877772808074951,
+        "elevation": 3372,
+        "slope_deg": 43.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.942509174346924,
+              45.8671875
+            ],
+            [
+              6.940850214175188,
+              45.871541364327214
+            ],
+            [
+              6.9414682826650465,
+              45.87163331027253
+            ],
+            [
+              6.942096286674223,
+              45.871682820069466
+            ],
+            [
+              6.94272823177883,
+              45.87168942113711
+            ],
+            [
+              6.943358085936429,
+              45.87165305046695
+            ],
+            [
+              6.943979837063093,
+              45.87157405522432
+            ],
+            [
+              6.942509174346924,
+              45.8671875
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.8671875,
+        "start_lon": 6.942509174346924,
+        "elevation": 3288,
+        "slope_deg": 46.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.948981761932373,
+              45.868988037109375
+            ],
+            [
+              6.953083616078375,
+              45.872471297205394
+            ],
+            [
+              6.953552199763195,
+              45.872175963869175
+            ],
+            [
+              6.9539771577046645,
+              45.871850201134336
+            ],
+            [
+              6.9543544335942284,
+              45.87149711847134
+            ],
+            [
+              6.954680426258049,
+              45.87112008612483
+            ],
+            [
+              6.954952024030942,
+              45.870722702943986
+            ],
+            [
+              6.948981761932373,
+              45.868988037109375
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.868988037109375,
+        "start_lon": 6.948981761932373,
+        "elevation": 3187,
+        "slope_deg": 42.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.93474006652832,
+              45.87078857421875
+            ],
+            [
+              6.928901906828496,
+              45.87272930639054
+            ],
+            [
+              6.929201762030709,
+              45.873116717272985
+            ],
+            [
+              6.929554481457213,
+              45.87348190556426
+            ],
+            [
+              6.929956698330527,
+              45.873821385469085
+            ],
+            [
+              6.9304045734101365,
+              45.87413191658385
+            ],
+            [
+              6.930893831638815,
+              45.87441053482695
+            ],
+            [
+              6.93474006652832,
+              45.87078857421875
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.87078857421875,
+        "start_lon": 6.93474006652832,
+        "elevation": 2952,
+        "slope_deg": 47.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.973581790924072,
+              45.87259292602539
+            ],
+            [
+              6.973414565202184,
+              45.87709592551818
+            ],
+            [
+              6.974046475429292,
+              45.87708579627006
+            ],
+            [
+              6.974673950149845,
+              45.87703278167672
+            ],
+            [
+              6.975290999992116,
+              45.87693738777305
+            ],
+            [
+              6.975891735091929,
+              45.87680052511295
+            ],
+            [
+              6.9764704213125865,
+              45.87662350007789
+            ],
+            [
+              6.973581790924072,
+              45.87259292602539
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.87259292602539,
+        "start_lon": 6.973581790924072,
+        "elevation": 3298,
+        "slope_deg": 45.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.833752155303955,
+              45.87529373168945
+            ],
+            [
+              6.827376422212185,
+              45.87452791332907
+            ],
+            [
+              6.82729951352846,
+              45.87496473175393
+            ],
+            [
+              6.827284196601244,
+              45.87540469054898
+            ],
+            [
+              6.827330617633673,
+              45.87584359021953
+            ],
+            [
+              6.827438333527705,
+              45.87627724138042
+            ],
+            [
+              6.827606316113586,
+              45.87670150474457
+            ],
+            [
+              6.833752155303955,
+              45.87529373168945
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.87529373168945,
+        "start_lon": 6.833752155303955,
+        "elevation": 2085,
+        "slope_deg": 47.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.802679061889648,
+              45.87799835205078
+            ],
+            [
+              6.8007894279781125,
+              45.88035927405188
+            ],
+            [
+              6.801055167596244,
+              45.88045324288827
+            ],
+            [
+              6.801330479252056,
+              45.880532741381565
+            ],
+            [
+              6.801613740122219,
+              45.88059730092824
+            ],
+            [
+              6.801903280526795,
+              45.88064654098232
+            ],
+            [
+              6.802197393771158,
+              45.88068017129854
+            ],
+            [
+              6.802679061889648,
+              45.87799835205078
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.87799835205078,
+        "start_lon": 6.802679061889648,
+        "elevation": 1623,
+        "slope_deg": 32.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.999476909637451,
+              45.879798889160156
+            ],
+            [
+              6.993165854605636,
+              45.87880523278299
+            ],
+            [
+              6.9930566920500805,
+              45.87923870963746
+            ],
+            [
+              6.993008811755673,
+              45.879677533517544
+            ],
+            [
+              6.9930226707494025,
+              45.880117515761505
+            ],
+            [
+              6.9930981367444005,
+              45.88055445665081
+            ],
+            [
+              6.993234489402648,
+              45.88098418549729
+            ],
+            [
+              6.999476909637451,
+              45.879798889160156
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.879798889160156,
+        "start_lon": 6.999476909637451,
+        "elevation": 3442,
+        "slope_deg": 36.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.835046768188477,
+              45.882503509521484
+            ],
+            [
+              6.835301498806406,
+              45.885200388706
+            ],
+            [
+              6.835597964574847,
+              45.885178836044965
+            ],
+            [
+              6.835891181318643,
+              45.88514151368366
+            ],
+            [
+              6.836179420673004,
+              45.88508864161856
+            ],
+            [
+              6.836460983612341,
+              45.885020531503834
+            ],
+            [
+              6.836734210465159,
+              45.88493758481424
+            ],
+            [
+              6.835046768188477,
+              45.882503509521484
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.882503509521484,
+        "start_lon": 6.835046768188477,
+        "elevation": 1882,
+        "slope_deg": 39.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.893309116363525,
+              45.88430404663086
+            ],
+            [
+              6.890646790219754,
+              45.888409646370754
+            ],
+            [
+              6.891235032799031,
+              45.888570899496386
+            ],
+            [
+              6.891843072920824,
+              45.88869142465789
+            ],
+            [
+              6.892465106720539,
+              45.88877007141849
+            ],
+            [
+              6.893095196761128,
+              45.88880608907913
+            ],
+            [
+              6.893727328707114,
+              45.88879913384403
+            ],
+            [
+              6.893309116363525,
+              45.88430404663086
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.88430404663086,
+        "start_lon": 6.893309116363525,
+        "elevation": 3124,
+        "slope_deg": 52.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.954161167144775,
+              45.886104583740234
+            ],
+            [
+              6.948149292805186,
+              45.88443781531502
+            ],
+            [
+              6.9479443244697485,
+              45.88485413380317
+            ],
+            [
+              6.947798697141238,
+              45.885282388086104
+            ],
+            [
+              6.947713800861636,
+              45.88571849039102
+            ],
+            [
+              6.947690445982915,
+              45.886158278034195
+            ],
+            [
+              6.947728855432063,
+              45.886597553154594
+            ],
+            [
+              6.954161167144775,
+              45.886104583740234
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.886104583740234,
+        "start_lon": 6.954161167144775,
+        "elevation": 2847,
+        "slope_deg": 48.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.004654884338379,
+              45.88790512084961
+            ],
+            [
+              6.998498648111936,
+              45.88651653734537
+            ],
+            [
+              6.998333360581676,
+              45.88694132056573
+            ],
+            [
+              6.998228413260208,
+              45.88737530345259
+            ],
+            [
+              6.998184807890709,
+              45.8878143435525
+            ],
+            [
+              6.998202960695154,
+              45.88825425013986
+            ],
+            [
+              6.998282698401392,
+              45.88869082421831
+            ],
+            [
+              7.004654884338379,
+              45.88790512084961
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.88790512084961,
+        "start_lon": 7.004654884338379,
+        "elevation": 3486,
+        "slope_deg": 56.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.0318450927734375,
+              45.88970947265625
+            ],
+            [
+              7.03754578122852,
+              45.89184165312888
+            ],
+            [
+              7.037817499222111,
+              45.89144427621355
+            ],
+            [
+              7.038032209401452,
+              45.891030340251234
+            ],
+            [
+              7.03818786231493,
+              45.890603796343505
+            ],
+            [
+              7.0382829722243505,
+              45.890168715937286
+            ],
+            [
+              7.038316631286603,
+              45.88972925196208
+            ],
+            [
+              7.0318450927734375,
+              45.88970947265625
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.88970947265625,
+        "start_lon": 7.0318450927734375,
+        "elevation": 2474,
+        "slope_deg": 35.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.044792175292969,
+              45.891510009765625
+            ],
+            [
+              7.042344139413273,
+              45.8873401951575
+            ],
+            [
+              7.041771208862633,
+              45.88752636556346
+            ],
+            [
+              7.041227114040873,
+              45.8877505606502
+            ],
+            [
+              7.040717048441906,
+              45.888010640430764
+            ],
+            [
+              7.040245880743907,
+              45.88830412239164
+            ],
+            [
+              7.039818108336803,
+              45.888628205188795
+            ],
+            [
+              7.044792175292969,
+              45.891510009765625
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.891510009765625,
+        "start_lon": 7.044792175292969,
+        "elevation": 2432,
+        "slope_deg": 44.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.929562091827393,
+              45.89421463012695
+            ],
+            [
+              6.935599018824765,
+              45.89583851849203
+            ],
+            [
+              6.9357978895750225,
+              45.895420762793194
+            ],
+            [
+              6.935937238388393,
+              45.89499149431679
+            ],
+            [
+              6.936015735152576,
+              45.89455481051629
+            ],
+            [
+              6.936032630600259,
+              45.89411487962593
+            ],
+            [
+              6.935987763461012,
+              45.89367590087406
+            ],
+            [
+              6.929562091827393,
+              45.89421463012695
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.89421463012695,
+        "start_lon": 6.929562091827393,
+        "elevation": 2334,
+        "slope_deg": 39.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.7495951652526855,
+              45.896915435791016
+            ],
+            [
+              6.747448157265375,
+              45.899167530017756
+            ],
+            [
+              6.747702747288287,
+              45.89927552713301
+            ],
+            [
+              6.74796849216046,
+              45.89936961270035
+            ],
+            [
+              6.748243825449931,
+              45.89944923213283
+            ],
+            [
+              6.74852712420585,
+              45.89951391611406
+            ],
+            [
+              6.748816718524964,
+              45.8995632833646
+            ],
+            [
+              6.7495951652526855,
+              45.896915435791016
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.896915435791016,
+        "start_lon": 6.7495951652526855,
+        "elevation": 1885,
+        "slope_deg": 32.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.0473809242248535,
+              45.898719787597656
+            ],
+            [
+              7.052503778967919,
+              45.90147302582071
+            ],
+            [
+              7.052865387735572,
+              45.9011119887854
+            ],
+            [
+              7.053174646201923,
+              45.900728117711225
+            ],
+            [
+              7.053428602433049,
+              45.90032507672438
+            ],
+            [
+              7.053624832365921,
+              45.8999067129317
+            ],
+            [
+              7.053761462946579,
+              45.89947701969928
+            ],
+            [
+              7.0473809242248535,
+              45.898719787597656
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.898719787597656,
+        "start_lon": 7.0473809242248535,
+        "elevation": 2796,
+        "slope_deg": 37.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.932150840759277,
+              45.902320861816406
+            ],
+            [
+              6.938613838059597,
+              45.902069656979215
+            ],
+            [
+              6.938547766619202,
+              45.901631977322474
+            ],
+            [
+              6.938420635241855,
+              45.90120087320603
+            ],
+            [
+              6.9382336574219865,
+              45.90078045960491
+            ],
+            [
+              6.937988617900287,
+              45.90037474945104
+            ],
+            [
+              6.93768785562801,
+              45.89998761532899
+            ],
+            [
+              6.932150840759277,
+              45.902320861816406
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.902320861816406,
+        "start_lon": 6.932150840759277,
+        "elevation": 2350,
+        "slope_deg": 40.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.951571941375732,
+              45.905025482177734
+            ],
+            [
+              6.947680003773847,
+              45.90142601113537
+            ],
+            [
+              6.947193804533263,
+              45.901707464372926
+            ],
+            [
+              6.946749395484627,
+              45.902020588754155
+            ],
+            [
+              6.946351018601205,
+              45.90236239544419
+            ],
+            [
+              6.946002476470041,
+              45.90272962182982
+            ],
+            [
+              6.945707095995497,
+              45.90311876266173
+            ],
+            [
+              6.951571941375732,
+              45.905025482177734
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.905025482177734,
+        "start_lon": 6.951571941375732,
+        "elevation": 2145,
+        "slope_deg": 33.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.870004177093506,
+              45.908626556396484
+            ],
+            [
+              6.867581984236167,
+              45.910739402684584
+            ],
+            [
+              6.8678220842728415,
+              45.91086247578878
+            ],
+            [
+              6.868075046645929,
+              45.91097236927608
+            ],
+            [
+              6.868339380269847,
+              45.9110684353798
+            ],
+            [
+              6.868613527031229,
+              45.911150107838736
+            ],
+            [
+              6.868895870973208,
+              45.91121690523494
+            ],
+            [
+              6.870004177093506,
+              45.908626556396484
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.908626556396484,
+        "start_lon": 6.870004177093506,
+        "elevation": 1459,
+        "slope_deg": 34.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.954161167144775,
+              45.91133117675781
+            ],
+            [
+              6.94820323446049,
+              45.90956862470154
+            ],
+            [
+              6.947984468703272,
+              45.90998155245431
+            ],
+            [
+              6.947824660768242,
+              45.910407362641024
+            ],
+            [
+              6.947725336054107,
+              45.910841990818284
+            ],
+            [
+              6.947687442635134,
+              45.91128128837319
+            ],
+            [
+              6.947711342211584,
+              45.9117210621227
+            ],
+            [
+              6.954161167144775,
+              45.91133117675781
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.91133117675781,
+        "start_lon": 6.954161167144775,
+        "elevation": 2553,
+        "slope_deg": 46.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.890719890594482,
+              45.91493225097656
+            ],
+            [
+              6.887033465811034,
+              45.91407977820584
+            ],
+            [
+              6.886950326774124,
+              45.91427905502658
+            ],
+            [
+              6.8868894074143645,
+              45.91448218210794
+            ],
+            [
+              6.88685106682065,
+              45.914687962118236
+            ],
+            [
+              6.88683553099144,
+              45.914895182088124
+            ],
+            [
+              6.886842891502608,
+              45.91510262056041
+            ],
+            [
+              6.890719890594482,
+              45.91493225097656
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.91493225097656,
+        "start_lon": 6.890719890594482,
+        "elevation": 1780,
+        "slope_deg": 35.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.070685863494873,
+              45.91763687133789
+            ],
+            [
+              7.076968165315003,
+              45.918727235820825
+            ],
+            [
+              7.077091125043306,
+              45.918295541464424
+            ],
+            [
+              7.0771529452688435,
+              45.9178575599699
+            ],
+            [
+              7.077153035905197,
+              45.91741747195824
+            ],
+            [
+              7.0770913960872255,
+              45.91697947815755
+            ],
+            [
+              7.07696861417932,
+              45.91654775930626
+            ],
+            [
+              7.070685863494873,
+              45.91763687133789
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.91763687133789,
+        "start_lon": 7.070685863494873,
+        "elevation": 2481,
+        "slope_deg": 31.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.983940124511719,
+              45.921241760253906
+            ],
+            [
+              6.9867981075787045,
+              45.91719975128439
+            ],
+            [
+              6.986217468454141,
+              45.917025033129455
+            ],
+            [
+              6.985615091626095,
+              45.91689056447842
+            ],
+            [
+              6.984996726901888,
+              45.91679762886146
+            ],
+            [
+              6.984368276696508,
+              45.91674711336763
+            ],
+            [
+              6.983735739692879,
+              45.916739500177414
+            ],
+            [
+              6.983940124511719,
+              45.921241760253906
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.921241760253906,
+        "start_lon": 6.983940124511719,
+        "elevation": 3036,
+        "slope_deg": 31.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.893309116363525,
+              45.92394256591797
+            ],
+            [
+              6.889499049047927,
+              45.924472044359305
+            ],
+            [
+              6.889568674368531,
+              45.9246738146747
+            ],
+            [
+              6.889660347707816,
+              45.92487127464754
+            ],
+            [
+              6.889773528697692,
+              45.92506326035092
+            ],
+            [
+              6.889907550193316,
+              45.92524864012596
+            ],
+            [
+              6.890061622205581,
+              45.92542632125239
+            ],
+            [
+              6.893309116363525,
+              45.92394256591797
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.92394256591797,
+        "start_lon": 6.893309116363525,
+        "elevation": 1595,
+        "slope_deg": 39.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.012423992156982,
+              45.925743103027344
+            ],
+            [
+              7.015072603280276,
+              45.92985361590969
+            ],
+            [
+              7.0156366179130565,
+              45.92965421645477
+            ],
+            [
+              7.016169967390352,
+              45.92941748463982
+            ],
+            [
+              7.016667560784715,
+              45.929145680117365
+            ],
+            [
+              7.017124648467658,
+              45.928841397315956
+            ],
+            [
+              7.017536867445814,
+              45.92850754067578
+            ],
+            [
+              7.012423992156982,
+              45.925743103027344
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.925743103027344,
+        "start_lon": 7.012423992156982,
+        "elevation": 3287,
+        "slope_deg": 45.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.951571941375732,
+              45.92844772338867
+            ],
+            [
+              6.954353140531359,
+              45.924379757409746
+            ],
+            [
+              6.953769152577599,
+              45.924210399997285
+            ],
+            [
+              6.953164191803395,
+              45.92408148868421
+            ],
+            [
+              6.95254403268035,
+              45.923994253954795
+            ],
+            [
+              6.951914594751349,
+              45.923949528481984
+            ],
+            [
+              6.951281886127336,
+              45.923947739179354
+            ],
+            [
+              6.951571941375732,
+              45.92844772338867
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.92844772338867,
+        "start_lon": 6.951571941375732,
+        "elevation": 3124,
+        "slope_deg": 57.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.015013217926025,
+              45.93024826049805
+            ],
+            [
+              7.017276220489456,
+              45.934468817673284
+            ],
+            [
+              7.017857561456288,
+              45.934295079716975
+            ],
+            [
+              7.01841175259515,
+              45.93408271406171
+            ],
+            [
+              7.018933504040766,
+              45.93383374778015
+            ],
+            [
+              7.019417835571217,
+              45.933550557305246
+            ],
+            [
+              7.019860124145161,
+              45.93323584574675
+            ],
+            [
+              7.015013217926025,
+              45.93024826049805
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.93024826049805,
+        "start_lon": 7.015013217926025,
+        "elevation": 2919,
+        "slope_deg": 29.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.928267002105713,
+              45.932952880859375
+            ],
+            [
+              6.924610374077918,
+              45.93203810257449
+            ],
+            [
+              6.924520243898978,
+              45.93223590922335
+            ],
+            [
+              6.924452198969599,
+              45.93243794205833
+            ],
+            [
+              6.924406640380315,
+              45.93264301019778
+            ],
+            [
+              6.924383836676029,
+              45.93284990486846
+            ],
+            [
+              6.924383922273073,
+              45.933057406530665
+            ],
+            [
+              6.928267002105713,
+              45.932952880859375
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 45.932952880859375,
+        "start_lon": 6.928267002105713,
+        "elevation": 1831,
+        "slope_deg": 41.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.070685863494873,
+              45.93475341796875
+            ],
+            [
+              7.075104526364782,
+              45.93804685808578
+            ],
+            [
+              7.075545542854844,
+              45.93773125987743
+            ],
+            [
+              7.075940172733302,
+              45.937387237572395
+            ],
+            [
+              7.076284649179026,
+              45.93701807493238
+            ],
+            [
+              7.0765756840954355,
+              45.936627295688645
+            ],
+            [
+              7.076810499496034,
+              45.936218629907216
+            ],
+            [
+              7.070685863494873,
+              45.93475341796875
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.93475341796875,
+        "start_lon": 7.070685863494873,
+        "elevation": 2105,
+        "slope_deg": 45.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.930856227874756,
+              45.938358306884766
+            ],
+            [
+              6.924393845028127,
+              45.93805301413629
+            ],
+            [
+              6.92438184876218,
+              45.93849302307171
+            ],
+            [
+              6.924431651739974,
+              45.93893174611417
+            ],
+            [
+              6.924542778582123,
+              45.93936499556448
+            ],
+            [
+              6.924714168560689,
+              45.93978863596997
+            ],
+            [
+              6.924944185724043,
+              45.94019862359822
+            ],
+            [
+              6.930856227874756,
+              45.938358306884766
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.938358306884766,
+        "start_lon": 6.930856227874756,
+        "elevation": 2017,
+        "slope_deg": 29.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.943802833557129,
+              45.941959381103516
+            ],
+            [
+              6.940880439441245,
+              45.93793933778087
+            ],
+            [
+              6.940330258322448,
+              45.938156831224575
+            ],
+            [
+              6.9398132236289065,
+              45.93841062076752
+            ],
+            [
+              6.939334270560197,
+              45.93869828393776
+            ],
+            [
+              6.938897970819169,
+              45.93901707493278
+            ],
+            [
+              6.938508488974125,
+              45.93936395082876
+            ],
+            [
+              6.943802833557129,
+              45.941959381103516
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.941959381103516,
+        "start_lon": 6.943802833557129,
+        "elevation": 2440,
+        "slope_deg": 32.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.9593400955200195,
+              45.944664001464844
+            ],
+            [
+              6.9530893515270344,
+              45.94348131805036
+            ],
+            [
+              6.952953210986279,
+              45.94391110388834
+            ],
+            [
+              6.952878034536006,
+              45.9443480762843
+            ],
+            [
+              6.952864539750474,
+              45.944788064249295
+            ],
+            [
+              6.952912855440108,
+              45.9452268680102
+            ],
+            [
+              6.953022520421985,
+              45.94566029909734
+            ],
+            [
+              6.9593400955200195,
+              45.944664001464844
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.944664001464844,
+        "start_lon": 6.9593400955200195,
+        "elevation": 3250,
+        "slope_deg": 35.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.088812828063965,
+              45.94736862182617
+            ],
+            [
+              7.094214325472508,
+              45.94985554866835
+            ],
+            [
+              7.094537568221025,
+              45.94947718131691
+            ],
+            [
+              7.094806167179588,
+              45.94907868734333
+            ],
+            [
+              7.095017558517406,
+              45.948663870452314
+            ],
+            [
+              7.095169724461875,
+              45.948236690154076
+            ],
+            [
+              7.095261212558616,
+              45.94780122396999
+            ],
+            [
+              7.088812828063965,
+              45.94736862182617
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.94736862182617,
+        "start_lon": 7.088812828063965,
+        "elevation": 2103,
+        "slope_deg": 40.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.039612770080566,
+              45.95096969604492
+            ],
+            [
+              7.045421667973129,
+              45.95296440572715
+            ],
+            [
+              7.045673905483191,
+              45.952560770513095
+            ],
+            [
+              7.045868288243389,
+              45.952141948174976
+            ],
+            [
+              7.046002960831391,
+              45.95171193645577
+            ],
+            [
+              7.046076637770406,
+              45.951274839903384
+            ],
+            [
+              7.046088615799313,
+              45.95083483069182
+            ],
+            [
+              7.039612770080566,
+              45.95096969604492
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.95096969604492,
+        "start_lon": 7.039612770080566,
+        "elevation": 3566,
+        "slope_deg": 40.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.038318157196045,
+              45.95457458496094
+            ],
+            [
+              7.042686615009684,
+              45.95790125431077
+            ],
+            [
+              7.04313270044639,
+              45.957589010745814
+            ],
+            [
+              7.043532830104688,
+              45.95724799388374
+            ],
+            [
+              7.043883184666949,
+              45.95688145879872
+            ],
+            [
+              7.044180419928793,
+              45.95649290414146
+            ],
+            [
+              7.044421698720186,
+              45.95608603874389
+            ],
+            [
+              7.038318157196045,
+              45.95457458496094
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.95457458496094,
+        "start_lon": 7.038318157196045,
+        "elevation": 3554,
+        "slope_deg": 44.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.005949974060059,
+              45.95817565917969
+            ],
+            [
+              7.000792537495603,
+              45.96090251232431
+            ],
+            [
+              7.001199920340606,
+              45.961239368330084
+            ],
+            [
+              7.001652643398544,
+              45.96154698061916
+            ],
+            [
+              7.002146385337269,
+              45.96182241297072
+            ],
+            [
+              7.002676433291209,
+              45.962063036327855
+            ],
+            [
+              7.0032377278466145,
+              45.96226655389249
+            ],
+            [
+              7.005949974060059,
+              45.95817565917969
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.95817565917969,
+        "start_lon": 7.005949974060059,
+        "elevation": 3234,
+        "slope_deg": 40.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.022781848907471,
+              45.9617805480957
+            ],
+            [
+              7.025054443226373,
+              45.965998947994194
+            ],
+            [
+              7.025635772498065,
+              45.965824657033934
+            ],
+            [
+              7.026189860498196,
+              45.96561176424489
+            ],
+            [
+              7.026711418345967,
+              45.965362301731325
+            ],
+            [
+              7.027195467667393,
+              45.96507865066282
+            ],
+            [
+              7.0276373881148695,
+              45.964763518545574
+            ],
+            [
+              7.022781848907471,
+              45.9617805480957
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.9617805480957,
+        "start_lon": 7.022781848907471,
+        "elevation": 3391,
+        "slope_deg": 57.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.073276042938232,
+              45.96538543701172
+            ],
+            [
+              7.077842173062926,
+              45.9621890297502
+            ],
+            [
+              7.077371642569475,
+              45.961894568091594
+            ],
+            [
+              7.076862018758276,
+              45.96163342747514
+            ],
+            [
+              7.076318166090549,
+              45.96140810054025
+            ],
+            [
+              7.0757452757487975,
+              45.96122073807759
+            ],
+            [
+              7.075148816085933,
+              45.96107312849935
+            ],
+            [
+              7.073276042938232,
+              45.96538543701172
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.96538543701172,
+        "start_lon": 7.073276042938232,
+        "elevation": 2862,
+        "slope_deg": 37.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.084928035736084,
+              45.96898651123047
+            ],
+            [
+              7.090272034402983,
+              45.96643812225928
+            ],
+            [
+              7.089888742381405,
+              45.96608782925203
+            ],
+            [
+              7.089458099422576,
+              45.965765204744116
+            ],
+            [
+              7.088984216099682,
+              45.965473328250994
+            ],
+            [
+              7.088471615723835,
+              45.96521498579217
+            ],
+            [
+              7.087925191168159,
+              45.9649926432981
+            ],
+            [
+              7.084928035736084,
+              45.96898651123047
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.96898651123047,
+        "start_lon": 7.084928035736084,
+        "elevation": 2400,
+        "slope_deg": 32.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.003361225128174,
+              45.972591400146484
+            ],
+            [
+              7.0018568926576945,
+              45.976972890747284
+            ],
+            [
+              7.002479262278828,
+              45.977054003999385
+            ],
+            [
+              7.003110050411783,
+              45.97709252080502
+            ],
+            [
+              7.00374323605765,
+              45.97708807351359
+            ],
+            [
+              7.0043727753327785,
+              45.977040704575366
+            ],
+            [
+              7.004992659158858,
+              45.97695086613635
+            ],
+            [
+              7.003361225128174,
+              45.972591400146484
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.972591400146484,
+        "start_lon": 7.003361225128174,
+        "elevation": 3290,
+        "slope_deg": 39.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.091402053833008,
+              45.9761962890625
+            ],
+            [
+              7.094744162203623,
+              45.98005582105224
+            ],
+            [
+              7.095270150561606,
+              45.97981075284536
+            ],
+            [
+              7.095759217162554,
+              45.97953118385865
+            ],
+            [
+              7.09620669376793,
+              45.97921978263401
+            ],
+            [
+              7.096608309124025,
+              45.978879521558426
+            ],
+            [
+              7.096960229731927,
+              45.97851364849192
+            ],
+            [
+              7.091402053833008,
+              45.9761962890625
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.9761962890625,
+        "start_lon": 7.091402053833008,
+        "elevation": 2173,
+        "slope_deg": 36.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.087518215179443,
+              45.97979736328125
+            ],
+            [
+              7.090184565968908,
+              45.98390313969546
+            ],
+            [
+              7.090748393526101,
+              45.9837027351538
+            ],
+            [
+              7.091281388384822,
+              45.9834650530564
+            ],
+            [
+              7.091778463002526,
+              45.983192362126424
+            ],
+            [
+              7.092234872702555,
+              45.982887265253346
+            ],
+            [
+              7.092646260963022,
+              45.982552674647856
+            ],
+            [
+              7.087518215179443,
+              45.97979736328125
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.97979736328125,
+        "start_lon": 7.087518215179443,
+        "elevation": 2167,
+        "slope_deg": 50.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.9593400955200195,
+              45.98430252075195
+            ],
+            [
+              6.959432108131823,
+              45.97979847000982
+            ],
+            [
+              6.958799136933251,
+              45.97981372703465
+            ],
+            [
+              6.958171329292602,
+              45.979871830493444
+            ],
+            [
+              6.957554677759388,
+              45.979972225777054
+            ],
+            [
+              6.956955068395849,
+              45.98011395459241
+            ],
+            [
+              6.956378224593301,
+              45.98029566410963
+            ],
+            [
+              6.9593400955200195,
+              45.98430252075195
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.98430252075195,
+        "start_lon": 6.9593400955200195,
+        "elevation": 2300,
+        "slope_deg": 40.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.952867031097412,
+              45.989707946777344
+            ],
+            [
+              6.949305987641971,
+              45.99347212661542
+            ],
+            [
+              6.949851662054658,
+              45.99369559825127
+            ],
+            [
+              6.950426118768042,
+              45.99388100695612
+            ],
+            [
+              6.951023874477881,
+              45.994026582966804
+            ],
+            [
+              6.951639223486351,
+              45.994130936731175
+            ],
+            [
+              6.952266292164076,
+              45.994193072171676
+            ],
+            [
+              6.952867031097412,
+              45.989707946777344
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.989707946777344,
+        "start_lon": 6.952867031097412,
+        "elevation": 2064,
+        "slope_deg": 29.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.051266193389893,
+              45.99421310424805
+            ],
+            [
+              7.050837615872878,
+              45.9987077575265
+            ],
+            [
+              7.051470986645673,
+              45.99871536127161
+            ],
+            [
+              7.0521024026258745,
+              45.998679990072795
+            ],
+            [
+              7.052725836821646,
+              45.998601981555254
+            ],
+            [
+              7.053335338428881,
+              45.99848208032588
+            ],
+            [
+              7.0539250896328145,
+              45.998321430865886
+            ],
+            [
+              7.051266193389893,
+              45.99421310424805
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.99421310424805,
+        "start_lon": 7.051266193389893,
+        "elevation": 3006,
+        "slope_deg": 36.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.087518215179443,
+              45.99781799316406
+            ],
+            [
+              7.0883303102544994,
+              45.993348955839714
+            ],
+            [
+              7.087698666265137,
+              45.99331523328775
+            ],
+            [
+              7.087065299834064,
+              45.99332449047953
+            ],
+            [
+              7.086436256570562,
+              45.99337663905329
+            ],
+            [
+              7.085817540818414,
+              45.99347118124047
+            ],
+            [
+              7.085215058343238,
+              45.993607214616986
+            ],
+            [
+              7.087518215179443,
+              45.99781799316406
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 45.99781799316406,
+        "start_lon": 7.087518215179443,
+        "elevation": 2380,
+        "slope_deg": 41.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.960635185241699,
+              46.00412368774414
+            ],
+            [
+              6.958124172636616,
+              46.002059108574954
+            ],
+            [
+              6.9579035412475285,
+              46.00219900411552
+            ],
+            [
+              6.957699011521799,
+              46.00235024469516
+            ],
+            [
+              6.957511789058984,
+              46.002511938826956
+            ],
+            [
+              6.957342977441057,
+              46.00268313340556
+            ],
+            [
+              6.957193571727348,
+              46.0028628193253
+            ],
+            [
+              6.960635185241699,
+              46.00412368774414
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.00412368774414,
+        "start_lon": 6.960635185241699,
+        "elevation": 1741,
+        "slope_deg": 37.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.0616230964660645,
+              46.0068244934082
+            ],
+            [
+              7.058258552898012,
+              46.010675384923694
+            ],
+            [
+              7.058815635480996,
+              46.01088504959474
+            ],
+            [
+              7.059399515840677,
+              46.011055955444725
+            ],
+            [
+              7.060004620722224,
+              46.011186471143134
+            ],
+            [
+              7.0606251742785,
+              46.0112753508915
+            ],
+            [
+              7.061255253201677,
+              46.01132174631486
+            ],
+            [
+              7.0616230964660645,
+              46.0068244934082
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.0068244934082,
+        "start_lon": 7.0616230964660645,
+        "elevation": 2901,
+        "slope_deg": 40.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.1082329750061035,
+              46.00952911376953
+            ],
+            [
+              7.106807339921673,
+              46.012043907499404
+            ],
+            [
+              7.107089326753059,
+              46.012112459797926
+            ],
+            [
+              7.107378054813977,
+              46.01216578457479
+            ],
+            [
+              7.107671822198161,
+              46.012203567507335
+            ],
+            [
+              7.107968897295072,
+              46.01222558588423
+            ],
+            [
+              7.108267528996874,
+              46.01223170991826
+            ],
+            [
+              7.1082329750061035,
+              46.00952911376953
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.00952911376953,
+        "start_lon": 7.1082329750061035,
+        "elevation": 1734,
+        "slope_deg": 32.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.017602920532227,
+              46.01313018798828
+            ],
+            [
+              7.020376332897312,
+              46.017202120529596
+            ],
+            [
+              7.020935241507616,
+              46.01699473075449
+            ],
+            [
+              7.021462342447624,
+              46.01675045314563
+            ],
+            [
+              7.021952604433425,
+              46.01647161938167
+            ],
+            [
+              7.022401347816294,
+              46.01616089098664
+            ],
+            [
+              7.022804289250877,
+              46.015821233925244
+            ],
+            [
+              7.017602920532227,
+              46.01313018798828
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.01313018798828,
+        "start_lon": 7.017602920532227,
+        "elevation": 2516,
+        "slope_deg": 35.8
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.008540153503418,
+              46.0167350769043
+            ],
+            [
+              7.010992195261877,
+              46.02090532608902
+            ],
+            [
+              7.011566490260917,
+              46.020719257427814
+            ],
+            [
+              7.01211189827023,
+              46.02049515896653
+            ],
+            [
+              7.012623213261264,
+              46.02023516976981
+            ],
+            [
+              7.0130955546301506,
+              46.01994177148654
+            ],
+            [
+              7.013524413784036,
+              46.01961776466203
+            ],
+            [
+              7.008540153503418,
+              46.0167350769043
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.0167350769043,
+        "start_lon": 7.008540153503418,
+        "elevation": 2304,
+        "slope_deg": 30.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.105644226074219,
+              46.02033996582031
+            ],
+            [
+              7.111412162999076,
+              46.01827881246055
+            ],
+            [
+              7.111094985657642,
+              46.01789780341795
+            ],
+            [
+              7.110725779725636,
+              46.017540105304
+            ],
+            [
+              7.11030806934753,
+              46.017209132418756
+            ],
+            [
+              7.109845841652444,
+              46.016908043964605
+            ],
+            [
+              7.1093435086961865,
+              46.01663971389108
+            ],
+            [
+              7.105644226074219,
+              46.02033996582031
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.02033996582031,
+        "start_lon": 7.105644226074219,
+        "elevation": 2053,
+        "slope_deg": 33.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.060328960418701,
+              46.024845123291016
+            ],
+            [
+              7.0664934689564864,
+              46.023441714236014
+            ],
+            [
+              7.0662668142063145,
+              46.02303072765257
+            ],
+            [
+              7.065983481453952,
+              46.02263705983843
+            ],
+            [
+              7.0656461751672,
+              46.02226446843164
+            ],
+            [
+              7.065258115002036,
+              46.02191650989171
+            ],
+            [
+              7.064823005070365,
+              46.0215965055525
+            ],
+            [
+              7.060328960418701,
+              46.024845123291016
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.024845123291016,
+        "start_lon": 7.060328960418701,
+        "elevation": 2431,
+        "slope_deg": 31.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.044792175292969,
+              46.028446197509766
+            ],
+            [
+              7.050219154065797,
+              46.03091460923568
+            ],
+            [
+              7.050540184529983,
+              46.03053514026626
+            ],
+            [
+              7.050806349096192,
+              46.03013573192036
+            ],
+            [
+              7.051015107170395,
+              46.02972019663054
+            ],
+            [
+              7.051164466115016,
+              46.02929250076428
+            ],
+            [
+              7.0512530002690506,
+              46.028856726764154
+            ],
+            [
+              7.044792175292969,
+              46.028446197509766
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.028446197509766,
+        "start_lon": 7.044792175292969,
+        "elevation": 2542,
+        "slope_deg": 40.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.088812828063965,
+              46.03205108642578
+            ],
+            [
+              7.091735532529229,
+              46.030265775263906
+            ],
+            [
+              7.091529632055423,
+              46.03011536607636
+            ],
+            [
+              7.0913077173925885,
+              46.02997636698379
+            ],
+            [
+              7.091071096615719,
+              46.02984959731573
+            ],
+            [
+              7.09082116448493,
+              46.02973580431543
+            ],
+            [
+              7.0905593942240515,
+              46.02963565873522
+            ],
+            [
+              7.088812828063965,
+              46.03205108642578
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.03205108642578,
+        "start_lon": 7.088812828063965,
+        "elevation": 1773,
+        "slope_deg": 40.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.049971103668213,
+              46.0356559753418
+            ],
+            [
+              7.052277066244751,
+              46.03986642954193
+            ],
+            [
+              7.05285791051675,
+              46.03969012171738
+            ],
+            [
+              7.053411199639914,
+              46.039475307158696
+            ],
+            [
+              7.053931652358884,
+              46.03922403631381
+            ],
+            [
+              7.0544143008483475,
+              46.03893870761321
+            ],
+            [
+              7.054854538131925,
+              46.038622044576414
+            ],
+            [
+              7.049971103668213,
+              46.0356559753418
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 3,
+        "cone_length_m": 500,
+        "cone_angle_deg": 28,
+        "start_lat": 46.0356559753418,
+        "start_lon": 7.049971103668213,
+        "elevation": 2166,
+        "slope_deg": 37.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.051266193389893,
+              46.03926086425781
+            ],
+            [
+              7.054915097626912,
+              46.040203627897725
+            ],
+            [
+              7.055008537476424,
+              46.04000652443901
+            ],
+            [
+              7.055079918095386,
+              46.03980502568967
+            ],
+            [
+              7.055128818731056,
+              46.03960031938319
+            ],
+            [
+              7.0551549511388565,
+              46.03939361215999
+            ],
+            [
+              7.055158161281426,
+              46.03918612245487
+            ],
+            [
+              7.051266193389893,
+              46.03926086425781
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.03926086425781,
+        "start_lon": 7.051266193389893,
+        "elevation": 1934,
+        "slope_deg": 35.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.052559852600098,
+              46.04466247558594
+            ],
+            [
+              7.056453684027563,
+              46.044657643030796
+            ],
+            [
+              7.056441673796181,
+              46.04445030888032
+            ],
+            [
+              7.0564067821870475,
+              46.04424422534555
+            ],
+            [
+              7.056349214868598,
+              46.04404060718496
+            ],
+            [
+              7.056269311171134,
+              46.04384065462489
+            ],
+            [
+              7.056167542086643,
+              46.043645546284814
+            ],
+            [
+              7.052559852600098,
+              46.04466247558594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.04466247558594,
+        "start_lon": 7.052559852600098,
+        "elevation": 1783,
+        "slope_deg": 34.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.999476909637451,
+              46.05006790161133
+            ],
+            [
+              6.99559387087026,
+              46.04986325200731
+            ],
+            [
+              6.995582692883738,
+              46.050070608606156
+            ],
+            [
+              6.995594469340525,
+              46.05027794924864
+            ],
+            [
+              6.9956291308243514,
+              46.050484051766254
+            ],
+            [
+              6.9956864730232535,
+              46.05068770128863
+            ],
+            [
+              6.995766157933897,
+              46.050887697404576
+            ],
+            [
+              6.999476909637451,
+              46.05006790161133
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.05006790161133,
+        "start_lon": 6.999476909637451,
+        "elevation": 1494,
+        "slope_deg": 34.7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.976171970367432,
+              46.059078216552734
+            ],
+            [
+              6.972703743475827,
+              46.06030809207779
+            ],
+            [
+              6.972849939606624,
+              46.06048910387816
+            ],
+            [
+              6.973015717432944,
+              46.06066179920948
+            ],
+            [
+              6.973200099778131,
+              46.060825160119876
+            ],
+            [
+              6.973401999801268,
+              46.0609782236792
+            ],
+            [
+              6.973620227403572,
+              46.061120087654984
+            ],
+            [
+              6.976171970367432,
+              46.059078216552734
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "type": "cone",
+        "risque": 2,
+        "cone_length_m": 300,
+        "cone_angle_deg": 22,
+        "start_lat": 46.059078216552734,
+        "start_lon": 6.976171970367432,
+        "elevation": 1780,
+        "slope_deg": 32.1
+      }
+    }
+  ]
+}

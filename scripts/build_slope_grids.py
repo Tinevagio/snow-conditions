@@ -128,7 +128,7 @@ def compute_aspect_slope(z: np.ndarray, cell_size_m: float) -> Tuple[float, floa
     if dz_dx == 0 and dz_dy == 0:
         aspect_deg = 0.0
     else:
-        aspect_deg = math.degrees(math.atan2(dz_dx, -dz_dy)) % 360
+        aspect_deg = math.degrees(math.atan2(-dz_dx, dz_dy)) % 360
 
     return aspect_deg, slope_deg
 
@@ -141,9 +141,30 @@ def build_massif_grid(massif: dict) -> Optional[Path]:
     massif_name = massif["massif"]
     polygon     = massif.get("polygon", [])
 
+    # Skip si déjà calculé
+    out_path = OUTPUT_DIR / f"{massif_id}.npz"
+    if out_path.exists():
+        print(f"  → déjà calculé ({out_path.stat().st_size//1024} KB), skip")
+        return out_path
+
+    # Fallback : bbox carrée autour du centroïde si pas de polygone OSM
     if not polygon:
-        print(f"  ✗ pas de polygone")
-        return None
+        centroid = massif.get("centroid")
+        if not centroid:
+            print(f"  ✗ pas de polygone ni de centroïde")
+            return None
+        clat, clon = centroid[0], centroid[1]
+        pad_lat = 0.25   # ~28km
+        pad_lon = 0.25 / math.cos(math.radians(clat))
+        # Construire un polygone carré autour du centroïde
+        polygon = [
+            [clat - pad_lat, clon - pad_lon],
+            [clat + pad_lat, clon - pad_lon],
+            [clat + pad_lat, clon + pad_lon],
+            [clat - pad_lat, clon + pad_lon],
+            [clat - pad_lat, clon - pad_lon],
+        ]
+        print(f"  ⚠ pas de polygone OSM — bbox carrée autour du centroïde ({clat}, {clon})")
 
     lats = [p[0] for p in polygon]
     lons = [p[1] for p in polygon]

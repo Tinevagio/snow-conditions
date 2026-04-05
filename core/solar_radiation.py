@@ -158,7 +158,7 @@ def solar_to_temperature_correction(total_radiation: float,
     #slope_bonus = 1.0 + (slope / 90.0) * 0.2
     
     base_correction = total_radiation / 150.0
-    #slope_bonus = 1.0 + (slope / 90.0) * 0.2
+    slope_bonus = 1.0 + (slope / 90.0) * 0.2
     
     return min(base_correction * slope_bonus, 4.0)
 

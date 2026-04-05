@@ -50,15 +50,6 @@ from core.solar_radiation import best_powder_window
 from data.fetchers.openmeteo import get_hourly_weather
 from core.terrain import get_terrain_grid, get_terrain_data, TerrainPoint
 
-# Avalanche model — optionnel (nécessite les .npz précalculés)
-try:
-    from core.avalanche_model import compute_avalanche_zones
-    _avalanche_available = True
-    print("✅ AvalancheModel disponible")
-except Exception as e:
-    _avalanche_available = False
-    print(f"⚠️  AvalancheModel indisponible : {e}")
-
 from datetime import date
 
 logger = logging.getLogger(__name__)
@@ -321,7 +312,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
     spring_hours = []
     for w in sorted(weather_series, key=lambda x: x.hour):
         cond, _ = classify_snow_condition(gp, w, month, day)
-        if cond.name == "SPRING_SNOW" and w.hour <= 20:
+        if cond.name == "SPRING_SNOW" and w.hour <= 15:  # pas après 14h
             spring_hours.append(w.hour)
 
     spring_optimal = None
@@ -336,7 +327,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
             else:
                 cur_start, cur_len = spring_hours[i], 1
         if best_len >= 2:
-            spring_optimal = best_start + best_len // 2
+            spring_optimal = best_start  # première heure de la meilleure fenêtre
 
     return {"powder_until_hour": powder_until, "spring_optimal_hour": spring_optimal}
 
@@ -622,71 +613,3 @@ def debug_bera(lat: float, lon: float):
     if _bera_corrector is None:
         return {"error": "BeraCorrector non initialisé"}
     return _bera_corrector.get_massif_info(lat, lon)
-
-
-# ---------------------------------------------------------------------------
-# Endpoint avalanche
-# ---------------------------------------------------------------------------
-
-@app.get("/avalanche", tags=["Avalanche"])
-def get_avalanche(
-    bbox: str = Query(
-        ...,
-        description="Zone géographique : lat_min,lon_min,lat_max,lon_max",
-        example="45.87,6.85,45.95,6.95",
-    ),
-    max_zones: int = Query(
-        300, ge=10, le=1000,
-        description="Nombre max de zones de départ (impact perf)",
-    ),
-):
-    """
-    Calcule les zones de départ d'avalanche et les cônes de propagation
-    pour la bbox donnée, selon le niveau BERA du massif concerné.
-
-    Retourne un GeoJSON FeatureCollection avec :
-      - Points : zones de départ (pente > seuil BERA, exposition dangereuse)
-      - Polygones : cônes de propagation vers l'aval
-
-    Prérequis : grille pentes précalculée (scripts/build_slope_grids.py)
-    """
-    if not _avalanche_available:
-        raise HTTPException(
-            status_code=503,
-            detail="Module avalanche indisponible — vérifiez les imports serveur.",
-        )
-
-    lat_min, lon_min, lat_max, lon_max = _parse_bbox(bbox)
-
-    # Identifier le massif via le centre de la bbox
-    center_lat = (lat_min + lat_max) / 2
-    center_lon = (lon_min + lon_max) / 2
-
-    if _bera_corrector is None:
-        raise HTTPException(
-            status_code=503,
-            detail="BeraCorrector non initialisé — données massif indisponibles.",
-        )
-
-    massif_info = _bera_corrector.get_massif_info(center_lat, center_lon)
-    if not massif_info or "massif_id" not in massif_info:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Aucun massif trouvé pour ce point ({center_lat:.3f}, {center_lon:.3f}).",
-        )
-
-    massif_id = massif_info["massif_id"]
-
-    result = compute_avalanche_zones(
-        massif_id=massif_id,
-        bbox=(lat_min, lon_min, lat_max, lon_max),
-        max_zones=max_zones,
-    )
-
-    if result is None:
-        raise HTTPException(status_code=500, detail="Erreur calcul avalanche.")
-
-    if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
-
-    return result

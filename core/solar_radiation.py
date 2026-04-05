@@ -157,10 +157,10 @@ def solar_to_temperature_correction(total_radiation: float,
     #base_correction = absorbed / 100.0
     #slope_bonus = 1.0 + (slope / 90.0) * 0.2
     
-    base_correction = total_radiation / 100.0
-    slope_bonus = 1.0 + (slope / 90.0) * 0.2
+    base_correction = total_radiation / 150.0
+    #slope_bonus = 1.0 + (slope / 90.0) * 0.2
     
-    return min(base_correction * slope_bonus, 6.0)
+    return min(base_correction * slope_bonus, 4.0)
 
 
 def effective_radiation(hour_utc: float, lat: float, lon: float,

@@ -326,7 +326,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
                     best_start, best_len = cur_start, cur_len
             else:
                 cur_start, cur_len = spring_hours[i], 1
-        if best_len >= 2:
+        if best_len >= 1:
             spring_optimal = best_start  # première heure de la meilleure fenêtre
 
     return {"powder_until_hour": powder_until, "spring_optimal_hour": spring_optimal}

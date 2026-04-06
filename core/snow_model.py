@@ -229,10 +229,13 @@ def classify_snow_condition(
 
     # ------------------------------------------------------------------
     # RÈGLE 5 — NEIGE DE PRINTEMPS
+    # Neige ancienne, surface positive, transformation en cours.
+    # Bloquée si la neige a déjà trop chauffé (cycle humide irréversible)
     # ------------------------------------------------------------------
     if (THR_SPRING_LO <= temp_surface <= THR_SPRING_HI
             and fresh_snow < 10
-            and weather.direct_radiation > 50):
+            and weather.direct_radiation > 50
+            and weather.hours_above_zero_last_48h < 8):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------
@@ -244,6 +247,9 @@ def classify_snow_condition(
         else:
             return SnowCondition.POWDER_COLD, temp_surface  # fraîche et jamais en redoux
     elif temp_surface <= 0:
+        return SnowCondition.OLD_PACKED, temp_surface
+    elif temp_surface <= 2 and weather.hours_above_zero_last_48h >= 6:
+        # Soirée après journée chaude : pas de moquette, vieille neige
         return SnowCondition.OLD_PACKED, temp_surface
     else:
         return SnowCondition.WET_HEAVY, temp_surface
@@ -333,16 +339,13 @@ def create_mock_grid(
 # DEMO
 # ---------------------------------------------------------------------------
 
-from datetime import datetime, timezone
-from data.fetchers.openmeteo import get_hourly_weather
-#from snow_model import compute_snow_conditions, create_mock_grid
-today   = datetime.now(timezone.utc)
-grid    = create_mock_grid(45.90, 6.85, 45.95, 6.95)
-weather = get_hourly_weather(45.92, 6.87, target_date=today)
-
-
-
 if __name__ == "__main__":
+    from datetime import datetime, timezone
+    from data.fetchers.openmeteo import get_hourly_weather
+
+    today   = datetime.now(timezone.utc)
+    grid    = create_mock_grid(45.90, 6.85, 45.95, 6.95)
+    weather = get_hourly_weather(45.92, 6.87, target_date=today)
 
     # Box autour de Chamonix
     """

@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Névé — Conditions de neige</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg:     #f4f1ec;
+  --s1:     #edeae3;
+  --s2:     #e5e1d8;
+  --border: #ccc8be;
+  --text:   #2a2520;
+  --muted:  #8c8378;
+  --accent: #2c6e8a;
+  --green:  #3a9e6a;
+  --red:    #c0021a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Padding bas sur mobile pour la sidebar fixe */
+@media (max-width: 700px) {
+  body { padding-bottom: 0; } /* la carte prend tout, sidebar en overlay */
+}
+
+/* Bouton modes mobile — affiché uniquement sur mobile */
+.mode-toggle-btn {
+  display: none;
+}
+@media (max-width: 700px) {
+  .mode-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .mode-toggle-btn.active { border-color: var(--accent); color: var(--accent); }
+}
+
+/* Popup modes sur mobile */
+.mode-popup {
+  display: none;
+  position: fixed;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  z-index: 1002;
+  padding: 8px;
+  gap: 6px;
+  flex-direction: column;
+  min-width: 160px;
+}
+.mode-popup.visible { display: flex; }
+.mode-popup-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.mode-popup-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(44,110,138,.06); }
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 11px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.brand { display:flex; align-items:baseline; gap:9px; flex-shrink:0; }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight:700; color: var(--text);
+}
+.brand-sub {
+  color: var(--muted); font-size:9px;
+  letter-spacing:.18em; text-transform:uppercase;
+}
+
+/* API URL — discret */
+.api-url-wrap { display:flex; align-items:center; gap:6px; }
+.api-url-wrap input {
+  background: var(--bg); border:1px solid var(--border);
+  color: var(--text); padding:4px 8px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  border-radius:3px; outline:none; width:220px;
+  transition: border-color .2s;
+}
+.api-url-wrap input:focus { border-color: var(--accent); }
+.api-lbl { color:var(--muted); font-size:10px; letter-spacing:.06em; }
+
+.status { display:flex; align-items:center; gap:7px; margin-left:auto; }
+.dot { width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0; }
+.dot.ok  { background:var(--green); box-shadow:0 0 5px rgba(58,158,106,.4); }
+.dot.err { background:var(--red); }
+.dot.loading { background:var(--accent); animation: pulse .8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.status-txt { color:var(--muted); font-size:11px; }
+
+/* ── TIME BAR ── */
+.time-bar {
+  display:flex; align-items:center; gap:16px;
+  padding:9px 20px;
+  background:var(--s1); border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.time-big {
+  font-family:'Playfair Display',serif;
+  font-size:30px; font-weight:400; font-style:italic;
+  color:var(--accent); min-width:72px; line-height:1;
+}
+.slider-col { flex:1; max-width:520px; }
+input[type=range] {
+  -webkit-appearance:none; width:100%; height:2px;
+  background:var(--border); outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:13px;height:13px;
+  border-radius:50%; background:var(--accent);
+  cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.2);
+  transition:transform .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.3); }
+.hour-ticks {
+  display:flex; justify-content:space-between;
+  margin-top:4px; color:var(--muted); font-size:10px;
+}
+.date-input-wrap { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.date-input-wrap label { color:var(--muted); font-size:10px; letter-spacing:.06em; }
+.date-input-wrap input {
+  background:#fff; border:1px solid var(--border);
+  color:var(--text); padding:4px 8px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  border-radius:3px; outline:none;
+  transition:border-color .2s;
+}
+.date-input-wrap input:focus { border-color:var(--accent); }
+
+/* ── LAYOUT ── */
+.main { display:flex; flex:1; overflow:hidden; }
+
+/* ── MAP ── */
+#map { flex:1; position:relative; }
+
+/* ── DRAW OVERLAY ── */
+.draw-hint {
+  position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+  background:rgba(255,255,255,.92); border:1px solid var(--border);
+  border-radius:4px; padding:9px 18px;
+  font-size:12px; color:var(--text);
+  pointer-events:none; z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  transition:opacity .3s;
+}
+.draw-hint.hidden { opacity:0; }
+
+.bbox-info {
+  position:absolute; top:12px; left:12px;
+  background:rgba(255,255,255,.94); border:1px solid var(--border);
+  border-radius:4px; padding:10px 14px; z-index:1000;
+  font-size:11px; line-height:1.8;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  display:none;
+}
+.bbox-info.visible { display:block; }
+.bbox-dims { color:var(--accent); font-weight:500; font-size:13px; }
+.bbox-coords { color:var(--muted); font-size:10px; }
+
+.btn-group {
+  position:absolute; top:12px; right:12px;
+  display:flex; flex-direction:column; gap:6px; z-index:1000;
+}
+.map-btn {
+  background:#fff; border:1px solid var(--border);
+  color:var(--text); padding:7px 14px;
+  font-family:'DM Mono',monospace; font-size:11px;
+  letter-spacing:.05em; border-radius:3px;
+  cursor:pointer; transition:border-color .2s,color .2s,background .2s;
+  white-space:nowrap; text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.map-btn:hover { border-color:var(--accent); color:var(--accent); }
+.map-btn.primary { border-color:var(--accent); color:#fff; background:var(--accent); }
+.map-btn.primary:hover { background:#235a73; }
+.map-btn.danger:hover { border-color:var(--red); color:var(--red); }
+.map-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Loader spinner sur carte */
+.map-loader {
+  position:absolute; inset:0; background:rgba(244,241,236,.6);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:12px; z-index:500;
+  display:none;
+}
+.map-loader.visible { display:flex; }
+.spinner {
+  width:32px;height:32px;
+  border:2px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loader-txt { color:var(--muted); font-size:11px; letter-spacing:.1em; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:252px; flex-shrink:0;
+  background:#fff; border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.sb-section { border-bottom:1px solid var(--border); overflow:hidden; }
+.sb-section-body { padding:0 16px 14px; }
+.sb-section.collapsed .sb-section-body { display:none; }
+
+/* Header de section cliquable */
+.sb-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 16px 11px;
+  cursor:pointer; user-select:none;
+  transition:background .15s;
+}
+.sb-header:hover { background:var(--bg); }
+.sb-label {
+  font-size:9px; text-transform:uppercase;
+  letter-spacing:.18em; color:var(--muted);
+  margin:0;
+}
+.sb-chevron {
+  color:var(--muted); font-size:10px;
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.sb-section.collapsed .sb-chevron { transform:rotate(-90deg); }
+
+
+
+
+/* Légende */
+.leg-item {
+  display:flex; align-items:center; gap:8px;
+  padding:3px 3px; cursor:pointer;
+  border-radius:3px; transition:opacity .2s,background .15s;
+}
+.leg-item:hover { background:var(--bg); }
+.leg-item.off { opacity:.3; }
+.leg-swatch {
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(0,0,0,.1);
+}
+.leg-name { flex:1; color:var(--text); font-size:11px; }
+.leg-count { color:var(--muted); font-size:11px; min-width:20px; text-align:right; }
+
+/* Stats */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.stat-box { background:var(--bg); border:1px solid var(--border); border-radius:3px; padding:8px 10px; }
+.stat-val { font-family:'Playfair Display',serif; font-size:17px; color:var(--accent); line-height:1; }
+.stat-lbl { color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
+
+/* Détail */
+.detail { flex:1; overflow-y:auto; padding:14px 16px; }
+.detail::-webkit-scrollbar { width:3px; }
+.detail::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.detail-empty { color:var(--muted); font-size:11px; line-height:1.7; }
+.detail-coords { font-size:10px; color:var(--muted); margin-bottom:10px; letter-spacing:.04em; }
+.cond-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 10px; border-radius:3px;
+  font-size:11px; font-weight:500; margin-bottom:12px;
+}
+.detail-row {
+  display:flex; justify-content:space-between;
+  padding:5px 0; border-bottom:1px solid var(--s1);
+  font-size:11px;
+}
+.dr-lbl { color:var(--muted); }
+.dr-val { color:var(--text); }
+.tl-wrap { margin-top:12px; }
+.tl-row {
+  display:flex; align-items:center; gap:7px;
+  padding:2px 3px; border-radius:2px; cursor:pointer;
+  font-size:10px; transition:background .1s;
+}
+.tl-row:hover { background:var(--bg); }
+.tl-row.active { background:rgba(44,110,138,.08); }
+.tl-h { color:var(--muted); min-width:24px; }
+.tl-bar-bg { flex:1; height:5px; background:var(--s2); border-radius:3px; overflow:hidden; }
+.tl-bar { height:100%; border-radius:3px; transition:width .3s; }
+.tl-t { color:var(--text); min-width:36px; text-align:right; }
+
+/* Markers */
+.sm {
+  border-radius:50%; border:1.5px solid rgba(255,255,255,.75);
+  box-shadow:0 1px 4px rgba(0,0,0,.3); cursor:pointer;
+  transition:transform .15s,box-shadow .15s;
+}
+.sm:hover { transform:scale(1.5); box-shadow:0 2px 8px rgba(0,0,0,.4); }
+.sm.selected {
+  border:2px solid #fff;
+  box-shadow:0 0 0 2px var(--accent),0 2px 8px rgba(0,0,0,.4);
+  transform:scale(1.5);
+}
+
+/* ── MODE BUTTONS ── */
+.mode-bar {
+  display:flex; gap:0; align-items:center;
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius:4px; overflow:hidden; flex-shrink:0;
+}
+.mode-btn {
+  background:transparent; border:none; border-right:1px solid var(--border);
+  color:var(--muted); padding:6px 13px;
+  font-family:'DM Mono',monospace; font-size:10px;
+  letter-spacing:.07em; cursor:pointer;
+  transition:background .15s, color .15s;
+  white-space:nowrap;
+}
+.mode-btn:last-child { border-right:none; }
+.mode-btn:hover { background:var(--bg); color:var(--text); }
+.mode-btn.active { background:#fff; color:var(--accent); font-weight:500; }
+
+/* Marqueurs fenêtre : cercle + étiquette heure */
+.wm-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  cursor:pointer;
+}
+.wm-dot {
+  border-radius:50%; border:1.5px solid rgba(255,255,255,.8);
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+  transition:transform .15s;
+}
+.wm-wrap:hover .wm-dot { transform:scale(1.4); }
+.wm-label {
+  font-family:'DM Mono',monospace; font-size:9px; font-weight:500;
+  color:#fff; background:rgba(0,0,0,.55);
+  border-radius:2px; padding:0 3px; margin-top:2px;
+  white-space:nowrap; line-height:1.5;
+}
+
+/* Rectangle de sélection */
+.leaflet-interactive.draw-rect {
+  stroke: var(--accent) !important;
+  stroke-width: 2 !important;
+  fill: rgba(44,110,138,.08) !important;
+}
+
+/* ── BERA ENNEIGEMENT ── */
+.bera-block {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bera-title {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .15em;
+  color: var(--muted); padding: 6px 10px;
+  background: var(--s1); border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.bera-massif { color: var(--accent); font-size: 10px; text-transform: none; letter-spacing: 0; }
+.bera-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.bera-table th {
+  color: var(--muted); font-weight: 400; padding: 4px 8px;
+  text-align: right; border-bottom: 1px solid var(--s2);
+  font-size: 9px;
+}
+.bera-table th:first-child { text-align: left; }
+.bera-table td {
+  padding: 4px 8px; text-align: right;
+  border-bottom: 1px solid var(--s1);
+}
+.bera-table td:first-child { text-align: left; color: var(--muted); }
+.bera-table tr.highlight td { background: rgba(44,110,138,.07); font-weight: 500; color: var(--accent); }
+.bera-table tr.highlight td:first-child { color: var(--accent); }
+.bera-snow-bars { padding: 8px 10px; display: flex; gap: 10px; }
+.bera-snow-item { flex: 1; }
+.bera-snow-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 3px; }
+.bera-snow-val { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--accent); line-height: 1; }
+.bera-snow-unit { font-size: 9px; color: var(--muted); }
+.bera-limit { font-size: 10px; color: var(--muted); padding: 4px 10px 6px; border-top: 1px solid var(--s1); }
+
+/* ── HEATMAP TOGGLE ── */
+.heatmap-btn {
+  position: absolute; bottom: 20px; right: 12px;
+  background: #fff; border: 1px solid var(--border);
+  color: var(--text); padding: 6px 12px;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: .05em; border-radius: 3px;
+  cursor: pointer; z-index: 1000;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  transition: border-color .2s, color .2s;
+}
+.heatmap-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(44,110,138,.06); }
+.heatmap-legend {
+  position: absolute; bottom: 52px; right: 12px;
+  background: rgba(255,255,255,.95); border: 1px solid var(--border);
+  border-radius: 4px; padding: 8px 10px; z-index: 1000;
+  font-size: 9px; color: var(--muted);
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  display: none; min-width: 140px;
+}
+.heatmap-legend.visible { display: block; }
+.heatmap-grad {
+  width: 120px; height: 8px; border-radius: 3px;
+  background: linear-gradient(to right, #f4f1ec, #a8d5f0, #2c6e8a, #1a3f52);
+  margin: 4px 0 2px;
+}
+.heatmap-grad-labels { display: flex; justify-content: space-between; }
+.heatmap-opacity-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 8px;
+}
+.heatmap-opacity-row label { font-size: 9px; color: var(--muted); white-space: nowrap; }
+.heatmap-opacity-row input[type=range] {
+  flex: 1; height: 2px; cursor: pointer;
+}
+
+/* ── AVALANCHE ── */
+.aval-btn {
+  position: absolute; bottom: 20px; left: 12px;
+  background: #fff; border: 1px solid var(--border);
+  color: var(--text); padding: 6px 12px;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: .05em; border-radius: 3px;
+  cursor: pointer; z-index: 1000;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  transition: border-color .2s, color .2s;
+  display: none;
+}
+.aval-btn.active { border-color: #c0021a; color: #c0021a; background: rgba(192,2,26,.05); }
+.aval-btn.loading { opacity: .6; cursor: wait; }
+
+.aval-risque-bar {
+  display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.aval-risque-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; padding: 2px 6px; border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.aval-risque-swatch {
+  width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+}
+.aval-stats { font-size: 10px; color: var(--muted); margin-bottom: 8px; line-height: 1.7; }
+.aval-empty { font-size: 11px; color: var(--muted); line-height: 1.7; }
+
+@media (max-width: 700px) {
+
+  /* ── HEADER : juste le nom + statut ── */
+  header {
+    padding: 6px 12px;
+    gap: 8px;
+    min-height: 0;
+  }
+  .api-url-wrap { display: none; }
+  .brand-sub { display: none; }
+  .brand-name { font-size: 17px; }
+  .status-txt {
+    font-size: 9px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── TIME BAR : une seule ligne compacte ── */
+  .time-bar {
+    padding: 5px 10px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    min-height: 0;
+  }
+  .time-big { font-size: 18px; min-width: 36px; }
+  .slider-col { flex: 1; min-width: 0; }
+  .hour-ticks { display: none; }
+  .date-input-wrap { flex-shrink: 0; }
+  .date-input-wrap label { display: none; }
+  .date-input-wrap input { font-size: 10px; padding: 3px 5px; width: 110px; }
+  .mode-bar { display: none; }
+
+  /* ── LAYOUT : carte plein écran ── */
+  .main { flex-direction: column; position: relative; }
+  #map { flex: 1; min-height: 0; }
+
+  /* ── SIDEBAR : overlay fixe en bas ── */
+  .sidebar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    height: 42px;
+    border-left: none;
+    border-top: 2px solid var(--border);
+    background: #fff;
+    transition: height .3s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
+    z-index: 1001;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.12);
+  }
+  .sidebar.expanded {
+    height: 52vh;
+    overflow-y: auto;
+  }
+
+  /* Handle */
+  .sidebar-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    cursor: pointer;
+    background: #fff;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  .sidebar-handle-bar {
+    width: 32px; height: 3px;
+    background: var(--border); border-radius: 2px;
+  }
+  .sidebar-handle-txt {
+    font-size: 10px; color: var(--muted); letter-spacing: .08em;
+  }
+
+  /* Boutons carte au-dessus de la sidebar */
+  .btn-group {
+    position: fixed;
+    top: auto;
+    bottom: 52px;
+    right: 10px;
+    z-index: 1000;
+  }
+  .map-btn { font-size: 10px; padding: 6px 10px; }
+
+  /* Boutons flottants gauche */
+  .heatmap-btn {
+    position: fixed;
+    bottom: 52px;
+    left: 10px;
+    right: auto;
+    z-index: 1000;
+  }
+  .heatmap-legend {
+    position: fixed;
+    bottom: 94px;
+    left: 10px;
+    right: auto;
+  }
+  .aval-btn {
+    position: fixed;
+    bottom: 88px;
+    left: 10px;
+    z-index: 1000;
+  }
+
+  .draw-hint { bottom: 58px; font-size: 11px; padding: 6px 12px; }
+  .bbox-info { top: 6px; left: 6px; font-size: 10px; }
+
+  .sb-section.collapsed .sb-section-body { display: none; }
+  .sb-chevron { display: block; }
+}
+
+@media (min-width: 701px) {
+  .sidebar-handle { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-name">Névé</span>
+    <span class="brand-sub">conditions de neige</span>
+  </div>
+  <div class="api-url-wrap">
+    <span class="api-lbl">API</span>
+    <input id="apiUrl" type="text" value="https://snow-conditions.onrender.com" placeholder="https://snow-conditions.onrender.com">
+  </div>
+  <div class="status">
+    <div class="dot" id="dot"></div>
+    <span class="status-txt" id="statusTxt">Dessinez une zone sur la carte</span>
+  </div>
+</header>
+
+<div class="time-bar">
+  <div class="time-big" id="timeBig">12h</div>
+  <div class="slider-col">
+    <input type="range" id="slider" min="0" max="23" value="12">
+    <div class="hour-ticks">
+      <span>00</span><span>03</span><span>06</span><span>09</span>
+      <span>12</span><span>15</span><span>18</span><span>21</span><span>23</span>
+    </div>
+  </div>
+  <div class="date-input-wrap">
+    <label>Date</label>
+    <input type="date" id="dateInput">
+  </div>
+  <!-- Mode bar desktop -->
+  <div class="mode-bar">
+    <button class="mode-btn active" id="modeConditions" onclick="setMode('conditions')">Conditions</button>
+    <button class="mode-btn" id="modePoudre"     onclick="setMode('poudre')">❄ Poudre</button>
+    <button class="mode-btn" id="modeMoquette"   onclick="setMode('moquette')">☀ Moquette</button>
+  </div>
+  <!-- Bouton modes mobile -->
+  <button class="mode-toggle-btn active" id="modeToggleBtn" onclick="toggleModePopup()">
+    <span id="modeToggleLabel">Conditions</span> ▾
+  </button>
+</div>
+
+<!-- Popup modes mobile -->
+<div class="mode-popup" id="modePopup">
+  <button class="mode-popup-btn active" id="modePopConditions" onclick="setMode('conditions');closeModePopup()">Conditions</button>
+  <button class="mode-popup-btn" id="modePopPoudre"     onclick="setMode('poudre');closeModePopup()">❄ Poudre</button>
+  <button class="mode-popup-btn" id="modePopMoquette"   onclick="setMode('moquette');closeModePopup()">☀ Moquette</button>
+</div>
+
+<div class="main">
+  <div id="map">
+    <!-- Hint dessin -->
+    <div class="draw-hint" id="drawHint">
+      Cliquez et glissez pour délimiter une zone · max 5 × 5 km
+    </div>
+
+    <!-- Info bbox -->
+    <div class="bbox-info" id="bboxInfo">
+      <div class="bbox-dims" id="bboxDims">— × — km</div>
+      <div class="bbox-coords" id="bboxCoords">—</div>
+    </div>
+
+    <!-- Boutons carte -->
+    <div class="btn-group" id="btnGroup">
+      <button class="map-btn" id="btnDraw" onclick="setDrawMode(!drawMode)">Dessiner une zone</button>
+      <button class="map-btn primary" id="btnCalc" disabled>Calculer</button>
+      <button class="map-btn" id="btnWindows" disabled style="display:none">Fenêtres</button>
+      <button class="map-btn danger"  id="btnClear" style="display:none">Effacer</button>
+    </div>
+
+    <!-- Bouton avalanche -->
+    <button class="aval-btn" id="avalBtn" onclick="toggleAvalanche()">⚠ Avalanche</button>
+
+    <!-- Loader -->
+    <div class="map-loader" id="mapLoader">
+      <div class="spinner"></div>
+      <div class="loader-txt" id="loaderTxt">calcul en cours…</div>
+    </div>
+
+    <!-- Canvas heatmap -->
+    <canvas id="heatmapCanvas" style="position:absolute;inset:0;pointer-events:none;z-index:300;opacity:0;transition:opacity .4s;"></canvas>
+
+    <!-- Bouton heatmap -->
+    <button class="heatmap-btn" id="heatmapBtn" onclick="toggleHeatmap()" style="display:none">🗺 Enneigement</button>
+    <div class="heatmap-legend" id="heatmapLegend"
+      onmousedown="event.stopPropagation()"
+      ontouchstart="event.stopPropagation()"
+      onclick="event.stopPropagation()">
+      <div>Épaisseur de neige estimée</div>
+      <div class="heatmap-grad"></div>
+      <div class="heatmap-grad-labels"><span>0 cm</span><span>300+ cm</span></div>
+      <div class="heatmap-opacity-row">
+        <label>Opacité</label>
+        <input type="range" id="heatmapOpacity" min="20" max="95" value="65"
+          oninput="setHeatmapOpacity(this.value)"
+          onmousedown="event.stopPropagation()"
+          ontouchstart="event.stopPropagation()">
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <!-- Handle mobile -->
+    <div class="sidebar-handle" id="sidebarHandle" onclick="toggleSidebar()">
+      <div class="sidebar-handle-bar"></div>
+      <span class="sidebar-handle-txt" id="sidebarHandleTxt">Légende & Détail</span>
+    </div>
+
+    <!-- Avalanche (accordéon) -->
+    <div class="sb-section collapsed" id="sec-avalanche">
+      <div class="sb-header" onclick="toggleSection('sec-avalanche')">
+        <span class="sb-label">⚠ Risque avalanche</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body">
+        <div id="avalPanel">
+          <div class="aval-empty">Calculez une zone pour voir le risque avalanche.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conditions (accordéon) -->
+    <div class="sb-section" id="sec-conditions">
+      <div class="sb-header" onclick="toggleSection('sec-conditions')">
+        <span class="sb-label">Conditions</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body">
+        <div id="legend"></div>
+      </div>
+    </div>
+
+    <!-- Statistiques (accordéon) -->
+    <div class="sb-section" id="sec-stats">
+      <div class="sb-header" onclick="toggleSection('sec-stats')">
+        <span class="sb-label">Statistiques</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body">
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-val" id="sNb">—</div><div class="stat-lbl">Points</div></div>
+          <div class="stat-box"><div class="stat-val" id="sMin">—</div><div class="stat-lbl">Alt. min</div></div>
+          <div class="stat-box"><div class="stat-val" id="sMax">—</div><div class="stat-lbl">Alt. max</div></div>
+          <div class="stat-box"><div class="stat-val" id="sSlope">—</div><div class="stat-lbl">Pente moy.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détail (accordéon, flex:1 pour prendre l'espace restant) -->
+    <div class="sb-section" id="sec-detail" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div class="sb-header" onclick="toggleSection('sec-detail')">
+        <span class="sb-label">Détail point</span>
+        <span class="sb-chevron">▾</span>
+      </div>
+      <div class="sb-section-body" id="detail" style="flex:1;overflow-y:auto;padding-top:4px">
+        <div class="detail-empty">Cliquez sur un point de la carte.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const CONDS = {
+  POWDER_COLD: { label:'Poudre froide',       color:'#2a7fd4' },
+  POWDER_WARM: { label:'Poudre réchauffée',   color:'#60a8e8' },
+  SPRING_SNOW: { label:'Neige de printemps',  color:'#d4820a' },
+  OLD_PACKED:  { label:'Neige ancienne',      color:'#5a90b8' },
+  CRUST:       { label:'Croûte de regel',     color:'#c0021a' },
+  WET_HEAVY:   { label:'Neige humide',        color:'#7a4a1e' },
+  NO_SNOW:     { label:'Pas de neige',        color:'#b0a898' },
+  UNDEFINED:   { label:'Indéterminé',         color:'#aaa'    },
+};
+
+const MAX_KM = 5;   // limite bbox en km
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let hour = 12, data = null, markers = [], selectedPoint = null;
+let hiddenConds = new Set();
+let bbox = null;
+let drawRect = null;
+let isDrawing = false;
+let drawStart = null;
+let currentMode = 'conditions';  // 'conditions' | 'poudre' | 'moquette'
+let windowData = null;           // réponse /best-window
+
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+const map = L.map('map', { center:[45.925, 6.90], zoom:13, zoomControl:true });
+
+L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  attribution:'© OpenStreetMap contributors, © OpenTopoMap (CC-BY-SA)',
+  maxZoom:17,
+}).addTo(map);
+
+// Date par défaut = aujourd'hui
+document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function clampBbox(latS, lonW, latN, lonE) {
+  // S'assure que la bbox ne dépasse pas MAX_KM dans chaque dimension
+  let dLat = latN - latS;
+  let dLon = lonE - lonW;
+
+  const hKm = haversineKm(latS, lonW, latN, lonW);
+  const wKm = haversineKm(latS, lonW, latS, lonE);
+
+  if (hKm > MAX_KM) {
+    const ratio = MAX_KM / hKm;
+    const center = (latS + latN) / 2;
+    dLat = dLat * ratio;
+    latS = center - dLat/2;
+    latN = center + dLat/2;
+  }
+  if (wKm > MAX_KM) {
+    const ratio = MAX_KM / wKm;
+    const center = (lonW + lonE) / 2;
+    dLon = dLon * ratio;
+    lonW = center - dLon/2;
+    lonE = center + dLon/2;
+  }
+  return [latS, lonW, latN, lonE];
+}
+
+function bboxDimsKm(b) {
+  const h = haversineKm(b.lat_min, b.lon_min, b.lat_max, b.lon_min);
+  const w = haversineKm(b.lat_min, b.lon_min, b.lat_min, b.lon_max);
+  return { h: h.toFixed(1), w: w.toFixed(1) };
+}
+
+// ── DESSIN DE LA BOX ──────────────────────────────────────────────────────────
+let drawMode = false;
+
+function setDrawMode(on) {
+  drawMode = on;
+  const btn = document.getElementById('btnDraw');
+  if (on) {
+    btn.textContent = 'Annuler';
+    btn.classList.add('primary');
+    map.getContainer().style.cursor = 'crosshair';
+  } else {
+    btn.textContent = 'Dessiner une zone';
+    btn.classList.remove('primary');
+    map.getContainer().style.cursor = '';
+    isDrawing = false;
+    drawStart = null;
+    map.dragging.enable();
+  }
+}
+
+map.on('mousedown', (e) => {
+  if (!drawMode) return;
+  if (e.originalEvent.button !== 0) return;
+
+  isDrawing = true;
+  drawStart = e.latlng;
+  map.dragging.disable();
+
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+});
+
+// ── TOUCH SUPPORT ─────────────────────────────────────────────────────────────
+map.getContainer().addEventListener('touchstart', (e) => {
+  if (!drawMode) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = map.getContainer().getBoundingClientRect();
+  const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
+  isDrawing = true;
+  drawStart = latlng;
+  map.dragging.disable();
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+}, { passive: false });
+
+map.getContainer().addEventListener('touchmove', (e) => {
+  if (!isDrawing || !drawStart) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = map.getContainer().getBoundingClientRect();
+  const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
+  const [latS, lonW, latN, lonE] = clampBbox(
+    Math.min(drawStart.lat, latlng.lat), Math.min(drawStart.lng, latlng.lng),
+    Math.max(drawStart.lat, latlng.lat), Math.max(drawStart.lng, latlng.lng),
+  );
+  const bounds = [[latS, lonW],[latN, lonE]];
+  if (drawRect) map.removeLayer(drawRect);
+  drawRect = L.rectangle(bounds, {
+    color: '#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.08, interactive: false,
+  }).addTo(map);
+  const dims = bboxDimsKm({ lat_min:latS, lon_min:lonW, lat_max:latN, lon_max:lonE });
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+  document.getElementById('bboxCoords').textContent =
+    `${latS.toFixed(3)}°N ${lonW.toFixed(3)}°E → ${latN.toFixed(3)}°N ${lonE.toFixed(3)}°E`;
+  document.getElementById('bboxInfo').classList.add('visible');
+}, { passive: false });
+
+map.getContainer().addEventListener('touchend', (e) => {
+  if (!isDrawing) return;
+  e.preventDefault();
+  isDrawing = false;
+  map.dragging.enable();
+  if (!drawStart || !drawRect) return;
+  const bounds = drawRect.getBounds();
+  const latS = bounds.getSouth(), lonW = bounds.getWest();
+  const latN = bounds.getNorth(), lonE = bounds.getEast();
+  const [csS, cwW, cnN, ceE] = clampBbox(latS, lonW, latN, lonE);
+  const w = haversineKm(csS, cwW, csS, ceE);
+  const h = haversineKm(csS, cwW, cnN, cwW);
+  if (w < 0.2 || h < 0.2) {
+    if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+    document.getElementById('bboxInfo').classList.remove('visible');
+    drawStart = null; return;
+  }
+  bbox = { lat_min:csS, lon_min:cwW, lat_max:cnN, lon_max:ceE };
+  document.getElementById('btnCalc').disabled = false;
+  document.getElementById('btnClear').style.display = 'block';
+  document.getElementById('drawHint').classList.add('hidden');
+  drawStart = null;
+  setDrawMode(false);
+}, { passive: false });
+
+map.on('mousemove', (e) => {
+  if (!isDrawing || !drawStart) return;
+
+  const [latS, lonW, latN, lonE] = clampBbox(
+    Math.min(drawStart.lat, e.latlng.lat),
+    Math.min(drawStart.lng, e.latlng.lng),
+    Math.max(drawStart.lat, e.latlng.lat),
+    Math.max(drawStart.lng, e.latlng.lng),
+  );
+
+  const bounds = [[latS, lonW],[latN, lonE]];
+  if (drawRect) map.removeLayer(drawRect);
+  drawRect = L.rectangle(bounds, {
+    color: '#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.08,
+    interactive: false,
+  }).addTo(map);
+
+  const dims = bboxDimsKm({ lat_min:latS, lon_min:lonW, lat_max:latN, lon_max:lonE });
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+  document.getElementById('bboxCoords').textContent =
+    `${latS.toFixed(3)}°N ${lonW.toFixed(3)}°E → ${latN.toFixed(3)}°N ${lonE.toFixed(3)}°E`;
+  document.getElementById('bboxInfo').classList.add('visible');
+});
+
+map.on('mouseup', (e) => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  map.dragging.enable();
+  if (!drawStart) return;
+
+  const latS = Math.min(drawStart.lat, e.latlng.lat);
+  const lonW = Math.min(drawStart.lng, e.latlng.lng);
+  const latN = Math.max(drawStart.lat, e.latlng.lat);
+  const lonE = Math.max(drawStart.lng, e.latlng.lng);
+  const [csS, cwW, cnN, ceE] = clampBbox(latS, lonW, latN, lonE);
+
+  const w = haversineKm(csS, cwW, csS, ceE);
+  const h = haversineKm(csS, cwW, cnN, cwW);
+  if (w < 0.2 || h < 0.2) {
+    if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+    document.getElementById('bboxInfo').classList.remove('visible');
+    drawStart = null;
+    return;
+  }
+
+  bbox = { lat_min:csS, lon_min:cwW, lat_max:cnN, lon_max:ceE };
+
+  if (drawRect) map.removeLayer(drawRect);
+  drawRect = L.rectangle([[csS, cwW],[cnN, ceE]], {
+    color:'#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.06,
+    interactive: false,
+  }).addTo(map);
+
+  const dims = bboxDimsKm(bbox);
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+  document.getElementById('bboxCoords').textContent =
+    `${csS.toFixed(3)}°N ${cwW.toFixed(3)}°E → ${cnN.toFixed(3)}°N ${ceE.toFixed(3)}°E`;
+
+  document.getElementById('btnCalc').disabled = false;
+  document.getElementById('btnClear').style.display = 'block';
+  document.getElementById('drawHint').classList.add('hidden');
+  drawStart = null;
+  setDrawMode(false);  // repasser en mode navigation automatiquement
+});
+
+function clearAll() {
+  setDrawMode(false);
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+  clearMarkers();
+  bbox = null; data = null; windowData = null; selectedPoint = null;
+  currentMode = 'conditions';
+  ['conditions','poudre','moquette'].forEach(m => {
+    const btn = document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1));
+    if (btn) btn.classList.toggle('active', m === 'conditions');
+  });
+  document.getElementById('slider').style.opacity = '1';
+  document.getElementById('slider').disabled = false;
+  document.getElementById('btnCalc').disabled = true;
+  document.getElementById('btnWindows').style.display = 'none';
+  document.getElementById('btnClear').style.display = 'none';
+  document.getElementById('heatmapBtn').style.display = 'none';
+  document.getElementById('heatmapBtn').classList.remove('active');
+  document.getElementById('heatmapLegend').classList.remove('visible');
+  const canvas = document.getElementById('heatmapCanvas');
+  canvas.style.opacity = '0';
+  if (window._heatmapOverlay) { map.removeLayer(window._heatmapOverlay); window._heatmapOverlay = null; }
+  heatmapActive = false;
+  // Avalanche
+  document.getElementById('avalBtn').style.display = 'none';
+  document.getElementById('avalBtn').classList.remove('active');
+  clearAvalancheLayers();
+  avalancheActive = false;
+  document.getElementById('avalPanel').innerHTML = '<div class="aval-empty">Calculez une zone pour voir le risque avalanche.</div>';
+  document.getElementById('bboxInfo').classList.remove('visible');
+  document.getElementById('drawHint').classList.remove('hidden');
+  document.getElementById('dot').className = 'dot';
+  document.getElementById('statusTxt').textContent = 'Dessinez une zone sur la carte';
+  document.getElementById('detail').innerHTML =
+    '<div class="detail-empty">Dessinez une zone puis cliquez sur un point.</div>';
+  buildLegend();
+  resetStats();
+}
+
+// ── MODES ─────────────────────────────────────────────────────────────────────
+const MODE_LABELS = { conditions: 'Conditions', poudre: '❄ Poudre', moquette: '☀ Moquette' };
+
+function setMode(mode) {
+  currentMode = mode;
+  ['conditions','poudre','moquette'].forEach(m => {
+    document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1))
+      ?.classList.toggle('active', m === mode);
+    document.getElementById('modePop' + m.charAt(0).toUpperCase() + m.slice(1))
+      ?.classList.toggle('active', m === mode);
+  });
+
+  // Mettre à jour le bouton mobile
+  const lbl = document.getElementById('modeToggleLabel');
+  if (lbl) lbl.textContent = MODE_LABELS[mode] || mode;
+
+  // La time-bar slider n'a de sens qu'en mode conditions
+  document.getElementById('slider').style.opacity = mode === 'conditions' ? '1' : '.3';
+  document.getElementById('slider').disabled = mode !== 'conditions';
+
+  if (mode === 'conditions') {
+    buildLegend();
+    renderMarkers();
+  } else {
+    if (windowData) {
+      renderWindowMarkers();
+    } else if (bbox) {
+      calculateWindows();
+    }
+  }
+}
+
+function toggleModePopup() {
+  document.getElementById('modePopup').classList.toggle('visible');
+}
+
+function closeModePopup() {
+  document.getElementById('modePopup').classList.remove('visible');
+}
+
+// Fermer le popup si on clique ailleurs
+document.addEventListener('click', e => {
+  const popup = document.getElementById('modePopup');
+  const btn   = document.getElementById('modeToggleBtn');
+  if (popup && !popup.contains(e.target) && btn && !btn.contains(e.target)) {
+    popup.classList.remove('visible');
+  }
+});
+
+// Couleur poudre : bleu foncé (tôt) → bleu clair (tard)  h in [0..12]
+function powderColor(h) {
+  if (h === null || h === undefined) return '#ccc';
+  const t = Math.min(1, h / 12);
+  // #0a2e5c → #7ec8e3
+  const r = Math.round(10  + t*(126-10));
+  const g = Math.round(46  + t*(200-46));
+  const b = Math.round(92  + t*(227-92));
+  return `rgb(${r},${g},${b})`;
+}
+
+// Couleur moquette : orange clair (matin) → orange foncé (après-midi)  h in [5..18]
+function springColor(h) {
+  if (h === null || h === undefined) return '#ccc';
+  const t = Math.min(1, Math.max(0, (h-5) / 13));
+  // #f5c842 → #c0521a
+  const r = Math.round(245 + t*(192-245));
+  const g = Math.round(200 + t*(82-200));
+  const b = Math.round(66  + t*(26-66));
+  return `rgb(${r},${g},${b})`;
+}
+
+function renderWindowMarkers() {
+  clearMarkers();
+  if (!windowData) return;
+
+  const isPoudre = currentMode === 'poudre';
+  const pts = windowData.points;
+
+  pts.forEach(pt => {
+    const h = isPoudre ? pt.powder_until_hour : pt.spring_optimal_hour;
+    const color = isPoudre ? powderColor(h) : springColor(h);
+    const label = h !== null ? String(h).padStart(2,'0')+'h' : '—';
+    const sz = 11;
+
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="wm-wrap">
+              <div class="wm-dot" style="width:${sz}px;height:${sz}px;background:${color}"></div>
+              <div class="wm-label" style="${h===null?'opacity:.5':''}">${label}</div>
+            </div>`,
+      iconSize:[sz, sz+16], iconAnchor:[sz/2, sz/2],
+    });
+
+    const lm = L.marker([pt.lat, pt.lon], { icon }).addTo(map);
+    lm.on('click', () => selectWindowPoint(pt, lm, isPoudre));
+    markers.push({ lm, pt });
+  });
+
+  updateWindowLegend();
+}
+
+function selectWindowPoint(pt, lm, isPoudre) {
+  const h = isPoudre ? pt.powder_until_hour : pt.spring_optimal_hour;
+  const typeLabel = isPoudre ? 'Poudre jusqu\'à' : 'Moquette optimale à';
+  const hStr = h !== null ? String(h).padStart(2,'0')+'h' : '—';
+
+  document.getElementById('detail').innerHTML = `
+    <div class="sb-label">${isPoudre ? 'Fenêtre poudre' : 'Fenêtre moquette'}</div>
+    <div class="detail-coords">${pt.lat.toFixed(4)}°N &nbsp;${pt.lon.toFixed(4)}°E</div>
+    <div class="cond-badge" style="background:${isPoudre?'rgba(44,110,138,.1)':'rgba(192,82,26,.1)'};color:${isPoudre?'#2c6e8a':'#c0521a'};border:1px solid ${isPoudre?'#2c6e8a44':'#c0521a44'}">
+      ${typeLabel} <strong>${hStr}</strong>
+    </div>
+    <div class="detail-row"><span class="dr-lbl">Altitude</span><span class="dr-val">${pt.elevation_m} m</span></div>
+    <div class="detail-row"><span class="dr-lbl">Exposition</span><span class="dr-val">${pt.aspect_label}</span></div>
+    <div class="detail-row"><span class="dr-lbl">Pente</span><span class="dr-val">${(pt.slope_deg||0).toFixed(1)}°</span></div>
+    <div class="detail-row"><span class="dr-lbl">Poudre jusqu'à</span><span class="dr-val">${pt.powder_until_hour !== null ? pt.powder_until_hour+'h' : '—'}</span></div>
+    <div class="detail-row"><span class="dr-lbl">Moquette optimale</span><span class="dr-val">${pt.spring_optimal_hour !== null ? pt.spring_optimal_hour+'h' : '—'}</span></div>
+  `;
+}
+
+function updateWindowLegend() {
+  const c = document.getElementById('legend');
+  const isPoudre = currentMode === 'poudre';
+
+  if (isPoudre) {
+    // Moyenne heure limite poudre
+    const powderHours = (windowData?.points || [])
+      .map(p => p.powder_until_hour).filter(h => h !== null);
+    const avgPowder = powderHours.length
+      ? Math.round(powderHours.reduce((a,b) => a+b, 0) / powderHours.length)
+      : null;
+    const avgPowderStr = avgPowder !== null
+      ? `Moy. zone : poudre jusqu'à <strong>${String(avgPowder).padStart(2,'0')}h</strong>`
+      : 'Pas de poudre sur la zone';
+
+    c.innerHTML = `
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Heure limite de poudre</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <div style="height:8px;flex:1;border-radius:3px;background:linear-gradient(to right,#0a2e5c,#7ec8e3)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted)">
+        <span>0h (courte)</span><span>12h+ (longue)</span>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">${avgPowderStr}</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px">— = pas de poudre</div>`;
+  } else {
+    // Moyenne heure optimale moquette
+    const springHours = (windowData?.points || [])
+      .map(p => p.spring_optimal_hour).filter(h => h !== null);
+    const avgSpring = springHours.length
+      ? Math.round(springHours.reduce((a,b) => a+b, 0) / springHours.length)
+      : null;
+    const avgSpringStr = avgSpring !== null
+      ? `Moy. zone : moquette à <strong>${String(avgSpring).padStart(2,'0')}h</strong> (${springHours.length} pts)`
+      : 'Pas de moquette sur la zone';
+
+    c.innerHTML = `
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Heure optimale moquette</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <div style="height:8px;flex:1;border-radius:3px;background:linear-gradient(to right,#f5c842,#c0521a)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted)">
+        <span>matin</span><span>après-midi</span>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">${avgSpringStr}</div>
+      <div style="font-size:9px;color:var(--muted);margin-top:2px">— = pas de moquette</div>`;
+  }
+}
+
+// ── APPEL /best-window ────────────────────────────────────────────────────────
+async function calculateWindows() {
+  if (!bbox) return;
+  const base = document.getElementById('apiUrl').value.replace(/\/$/,'');
+  const date = document.getElementById('dateInput').value || new Date().toISOString().slice(0,10);
+  const bboxStr = `${bbox.lat_min},${bbox.lon_min},${bbox.lat_max},${bbox.lon_max}`;
+  const url = `${base}/best-window?bbox=${encodeURIComponent(bboxStr)}&date=${date}&resolution_m=500`;
+
+  document.getElementById('mapLoader').classList.add('visible');
+  document.getElementById('dot').className = 'dot loading';
+  document.getElementById('statusTxt').textContent = 'calcul fenêtres…';
+
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    windowData = await r.json();
+    renderWindowMarkers();
+    document.getElementById('dot').className = 'dot ok';
+    document.getElementById('statusTxt').textContent = `Fenêtres · ${windowData.points.length} pts · ${windowData.date}`;
+  } catch(e) {
+    document.getElementById('dot').className = 'dot err';
+    document.getElementById('statusTxt').textContent = 'Erreur fenêtres : ' + e.message;
+  } finally {
+    document.getElementById('mapLoader').classList.remove('visible');
+  }
+}
+
+// ── MARKERS ───────────────────────────────────────────────────────────────────
+function clearMarkers() {
+  markers.forEach(m => map.removeLayer(m.lm));
+  markers = [];
+}
+
+function renderMarkers() {
+  clearMarkers();
+  if (!data) return;
+
+  data.points.forEach(pt => {
+    const hd = pt.hours.find(h => h.hour === hour);
+    if (!hd) return;
+    const cond = hd.condition;
+    if (hiddenConds.has(cond)) return;
+
+    const meta = CONDS[cond] || CONDS.UNDEFINED;
+    const sz = 11; // taille fixe — la pente est visible sur la carte topo
+
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="sm" style="width:${sz}px;height:${sz}px;background:${meta.color}"></div>`,
+      iconSize:[sz,sz], iconAnchor:[sz/2,sz/2],
+    });
+
+    const lm = L.marker([pt.lat, pt.lon], { icon }).addTo(map);
+    lm.on('click', () => selectPoint(pt, lm));
+    markers.push({ lm, pt, cond });
+  });
+
+  updateLegendCounts();
+  updateStats();
+}
+
+function selectPoint(pt, lm) {
+  markers.forEach(m => m.lm.getElement()?.querySelector('.sm')?.classList.remove('selected'));
+  lm.getElement()?.querySelector('.sm')?.classList.add('selected');
+  selectedPoint = pt;
+  renderDetail();
+  expandSidebarIfMobile();
+}
+
+// ── LÉGENDE ───────────────────────────────────────────────────────────────────
+function buildLegend() {
+  const c = document.getElementById('legend');
+  c.innerHTML = '';
+  Object.entries(CONDS).forEach(([key, meta]) => {
+    if (key === 'UNDEFINED') return;
+    const el = document.createElement('div');
+    el.className = 'leg-item'; el.dataset.key = key;
+    el.innerHTML = `
+      <div class="leg-swatch" style="background:${meta.color}"></div>
+      <div class="leg-name">${meta.label}</div>
+      <div class="leg-count" id="lc-${key}">—</div>`;
+    el.addEventListener('click', () => {
+      hiddenConds.has(key) ? hiddenConds.delete(key) : hiddenConds.add(key);
+      el.classList.toggle('off');
+      renderMarkers();
+    });
+    c.appendChild(el);
+  });
+}
+
+function updateLegendCounts() {
+  const counts = {};
+  data?.points.forEach(pt => {
+    const hd = pt.hours.find(h => h.hour === hour);
+    if (hd) counts[hd.condition] = (counts[hd.condition]||0) + 1;
+  });
+  Object.keys(CONDS).forEach(k => {
+    const el = document.getElementById(`lc-${k}`);
+    if (el) el.textContent = counts[k] ?? '0';
+  });
+}
+
+function updateStats() {
+  if (!data?.points.length) return;
+  const elevs  = data.points.map(p => p.elevation_m).filter(Boolean);
+  const slopes = data.points.map(p => p.slope_deg).filter(Boolean);
+  document.getElementById('sNb').textContent    = data.points.length;
+  document.getElementById('sMin').textContent   = Math.round(Math.min(...elevs)) + 'm';
+  document.getElementById('sMax').textContent   = Math.round(Math.max(...elevs)) + 'm';
+  document.getElementById('sSlope').textContent = (slopes.reduce((a,b)=>a+b,0)/slopes.length).toFixed(0)+'°';
+}
+
+function resetStats() {
+  ['sNb','sMin','sMax','sSlope'].forEach(id => document.getElementById(id).textContent = '—');
+  Object.keys(CONDS).forEach(k => {
+    const el = document.getElementById(`lc-${k}`);
+    if (el) el.textContent = '—';
+  });
+}
+
+// ── DÉTAIL ────────────────────────────────────────────────────────────────────
+function renderDetail() {
+  if (!selectedPoint) return;
+  const pt = selectedPoint;
+  const hd = pt.hours.find(h => h.hour === hour) || pt.hours[0];
+  const meta = CONDS[hd.condition] || CONDS.UNDEFINED;
+  const tMin = Math.min(...pt.hours.map(h => h.temp_surface));
+  const tMax = Math.max(...pt.hours.map(h => h.temp_surface));
+  const tRange = tMax - tMin || 1;
+  const aspNames = {0:'Nord',45:'Nord-Est',90:'Est',135:'Sud-Est',
+                    180:'Sud',225:'Sud-Ouest',270:'Ouest',315:'Nord-Ouest'};
+  const aspLabel = aspNames[Math.round((pt.aspect_deg||0)/45)*45] || pt.aspect_label || '—';
+
+  document.getElementById('detail').innerHTML = `
+    <div class="sb-label">Détail point</div>
+    <div class="detail-coords">${pt.lat.toFixed(4)}°N &nbsp;${pt.lon.toFixed(4)}°E</div>
+    <div class="cond-badge" style="background:${meta.color}18;color:${meta.color};border:1px solid ${meta.color}44">
+      <div style="width:7px;height:7px;border-radius:50%;background:${meta.color}"></div>
+      ${meta.label}
+    </div>
+    <div class="detail-row"><span class="dr-lbl">Altitude</span><span class="dr-val">${pt.elevation_m} m</span></div>
+    <div class="detail-row"><span class="dr-lbl">Exposition</span><span class="dr-val">${aspLabel}</span></div>
+    <div class="detail-row"><span class="dr-lbl">Pente</span><span class="dr-val">${(pt.slope_deg||0).toFixed(1)}°</span></div>
+    <div class="detail-row"><span class="dr-lbl">T° surface</span><span class="dr-val">${hd.temp_surface>0?'+':''}${hd.temp_surface}°C</span></div>
+    <div class="detail-row"><span class="dr-lbl">Vent</span><span class="dr-val">${hd.wind_speed} m/s</span></div>
+    ${renderBeraBlock(pt)}
+    <div class="tl-wrap">
+      <div class="sb-label" style="margin-top:12px;margin-bottom:5px">24 heures</div>
+      ${pt.hours.map(h => {
+        const hm = CONDS[h.condition] || CONDS.UNDEFINED;
+        const w = Math.max(4, Math.round(((h.temp_surface-tMin)/tRange)*100));
+        return `<div class="tl-row ${h.hour===hour?'active':''}" onclick="setHour(${h.hour})">
+          <span class="tl-h">${String(h.hour).padStart(2,'0')}h</span>
+          <div class="tl-bar-bg"><div class="tl-bar" style="width:${w}%;background:${hm.color}"></div></div>
+          <span class="tl-t">${h.temp_surface>0?'+':''}${h.temp_surface}°</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ── HEURE ─────────────────────────────────────────────────────────────────────
+function setHour(h) {
+  hour = h;
+  document.getElementById('slider').value = h;
+  document.getElementById('timeBig').textContent = String(h).padStart(2,'0') + 'h';
+  renderMarkers();
+  if (selectedPoint) renderDetail();
+}
+
+// ── APPEL API ─────────────────────────────────────────────────────────────────
+async function calculate() {
+  if (!bbox) return;
+
+  const base = document.getElementById('apiUrl').value.replace(/\/$/,'');
+  const date = document.getElementById('dateInput').value || new Date().toISOString().slice(0,10);
+  const bboxStr = `${bbox.lat_min},${bbox.lon_min},${bbox.lat_max},${bbox.lon_max}`;
+  const url = `${base}/conditions?bbox=${encodeURIComponent(bboxStr)}&date=${date}&resolution_m=500`;
+
+  document.getElementById('mapLoader').classList.add('visible');
+  document.getElementById('dot').className = 'dot loading';
+  document.getElementById('statusTxt').textContent = 'calcul en cours…';
+  document.getElementById('btnCalc').disabled = true;
+
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    data = await r.json();
+
+    renderMarkers();
+    // Recentrer sur la bbox
+    map.fitBounds([[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]], { padding:[20,20] });
+
+    document.getElementById('dot').className = 'dot ok';
+    document.getElementById('statusTxt').textContent = `${data.points.length} points · ${data.date}`;
+    document.getElementById('btnWindows').style.display = 'block';
+    document.getElementById('btnWindows').disabled = false;
+    document.getElementById('heatmapBtn').style.display = 'block';
+    document.getElementById('avalBtn').style.display = 'block';
+  } catch(e) {
+    document.getElementById('dot').className = 'dot err';
+    document.getElementById('statusTxt').textContent = 'Erreur : ' + e.message;
+    document.getElementById('btnCalc').disabled = false;
+  } finally {
+    document.getElementById('mapLoader').classList.remove('visible');
+  }
+}
+
+// ── DÉMO ──────────────────────────────────────────────────────────────────────
+function loadDemo() {
+  // Bbox démo Chamonix
+  bbox = { lat_min:45.900, lon_min:6.850, lat_max:45.950, lon_max:6.950 };
+
+  if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
+  drawRect = L.rectangle(
+    [[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]],
+    { color:'#2c6e8a', weight:2, fillColor:'#2c6e8a', fillOpacity:.06, interactive:false }
+  ).addTo(map);
+  map.fitBounds([[bbox.lat_min, bbox.lon_min],[bbox.lat_max, bbox.lon_max]], { padding:[20,20] });
+
+  document.getElementById('bboxInfo').classList.add('visible');
+  document.getElementById('btnClear').style.display = 'block';
+  document.getElementById('drawHint').classList.add('hidden');
+
+  const dims = bboxDimsKm(bbox);
+  document.getElementById('bboxDims').textContent = `${dims.w} × ${dims.h} km`;
+
+  // Générer données démo
+  const pts = [];
+  const aspList = [0,45,90,135,180,225,270,315];
+  const aspKeys = ['N','NE','E','SE','S','SO','O','NO'];
+  for (let i = 0; i < 180; i++) {
+    const lat = 45.900 + Math.random()*.050;
+    const lon = 6.850  + Math.random()*.100;
+    const elev = 1100 + Math.random()*2200;
+    const ai = Math.floor(Math.random()*8);
+    const asp = aspList[ai];
+    const north = asp < 90 || asp > 270;
+    const south = asp > 90 && asp < 270;
+    const slope = 8 + Math.random()*40;
+    const snowLine = Math.max(800, 1800 - (new Date().getMonth()) * 80);
+
+    const hours = Array.from({length:24},(_,h) => {
+      let cond;
+      if (elev < snowLine) { cond = 'NO_SNOW'; }
+      else if (elev > 2800 && north) { cond = h<11||h>17 ? 'POWDER_COLD':'POWDER_WARM'; }
+      else if (elev > 2200 && north) { cond = h<8?'OLD_PACKED':h<15?'POWDER_WARM':'OLD_PACKED'; }
+      else if (south && elev<1800)   { cond = h<7?'OLD_PACKED':h<10?'SPRING_SNOW':'WET_HEAVY'; }
+      else if (south)                { cond = h<8?'OLD_PACKED':h<12?'SPRING_SNOW':h<17?'WET_HEAVY':'OLD_PACKED'; }
+      else                           { cond = h<7?'OLD_PACKED':h<10?'SPRING_SNOW':'WET_HEAVY'; }
+      const t = -5+Math.sin((h-6)*Math.PI/12)*10+(south?3:-3)-(elev-1500)/400;
+      return { hour:h, condition:cond, label:CONDS[cond]?.label||cond,
+               color:CONDS[cond]?.color||'#aaa',
+               temp_surface:Math.round(t*10)/10, wind_speed:+(2+Math.random()*7).toFixed(1) };
+    });
+    pts.push({ lat, lon, elevation_m:Math.round(elev),
+               aspect_deg:asp, aspect_label:aspKeys[ai],
+               slope_deg:Math.round(slope*10)/10, hours });
+  }
+  data = { date: new Date().toISOString().slice(0,10), points: pts };
+  renderMarkers();
+
+  document.getElementById('dot').className = 'dot ok';
+  document.getElementById('statusTxt').textContent = `${pts.length} points · démo`;
+}
+
+// ── ACCORDÉON ─────────────────────────────────────────────────────────────────
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── HEATMAP ───────────────────────────────────────────────────────────────────
+let heatmapActive = false;
+
+function setHeatmapOpacity(val) {
+  if (window._heatmapOverlay) {
+    window._heatmapOverlay.setOpacity(val / 100);
+  }
+}
+
+function toggleHeatmap() {
+  heatmapActive = !heatmapActive;
+  document.getElementById('heatmapBtn').classList.toggle('active', heatmapActive);
+  document.getElementById('heatmapLegend').classList.toggle('visible', heatmapActive);
+  if (heatmapActive) {
+    renderHeatmap();
+  } else {
+    if (window._heatmapOverlay) { map.removeLayer(window._heatmapOverlay); window._heatmapOverlay = null; }
+  }
+}
+
+// Couleur heatmap : échelle dynamique passée en paramètre
+function snowDepthColor(cm, snowMin, snowMax) {
+  if (cm <= 0) return [244, 241, 236, 0];
+  const range = snowMax - snowMin || 1;
+  const t = Math.min(1, Math.max(0, (cm - snowMin) / range));
+  // beige → bleu clair → bleu moyen → bleu foncé
+  const stops = [
+    [244, 241, 236],
+    [168, 213, 240],
+    [44,  110, 138],
+    [26,   63,  82],
+  ];
+  const seg = t * (stops.length - 1);
+  const i = Math.min(Math.floor(seg), stops.length - 2);
+  const f = seg - i;
+  const c = stops[i].map((v, j) => Math.round(v + f * (stops[i+1][j] - v)));
+  return [...c, Math.round(40 + t * 180)];
+}
+
+// Interpoler la neige au sol selon altitude + exposition à partir de enneigement_niveaux
+function interpolateSnow(pt) {
+  if (!pt.bera || !pt.bera.enneigement_niveaux || pt.bera.enneigement_niveaux.length === 0) return null;
+  const elev = pt.elevation_m;
+  const isNorth = pt.aspect_deg <= 90 || pt.aspect_deg >= 270;
+  const niveaux = pt.bera.enneigement_niveaux;
+
+  // Interpolation linéaire entre les niveaux
+  for (let i = 0; i < niveaux.length - 1; i++) {
+    const lo = niveaux[i], hi = niveaux[i+1];
+    if (elev >= lo.alti && elev <= hi.alti) {
+      const t = (elev - lo.alti) / (hi.alti - lo.alti);
+      const vLo = isNorth ? (lo.N_cm ?? lo.S_cm ?? 0) : (lo.S_cm ?? lo.N_cm ?? 0);
+      const vHi = isNorth ? (hi.N_cm ?? hi.S_cm ?? 0) : (hi.S_cm ?? hi.N_cm ?? 0);
+      return vLo + t * (vHi - vLo);
+    }
+  }
+  // Extrapolation au-dessus du dernier niveau
+  if (elev > niveaux[niveaux.length-1].alti) {
+    const last = niveaux[niveaux.length-1];
+    const extra = (elev - last.alti) * 0.05; // +5cm/100m
+    const v = isNorth ? (last.N_cm ?? 0) : (last.S_cm ?? 0);
+    return v + extra;
+  }
+  // En-dessous du premier niveau
+  const first = niveaux[0];
+  const lim = isNorth ? (pt.bera.limite_nord_m ?? first.alti) : (pt.bera.limite_sud_m ?? first.alti);
+  if (elev < lim) return 0;
+  const t = Math.max(0, (elev - lim) / Math.max(1, first.alti - lim));
+  const v = isNorth ? (first.N_cm ?? 0) : (first.S_cm ?? 0);
+  return t * v;
+}
+
+function renderHeatmap() {
+  if (!data || !heatmapActive) return;
+
+  const W = 400, H = 400;
+  const offscreen = document.createElement('canvas');
+  offscreen.width = W; offscreen.height = H;
+  const ctx = offscreen.getContext('2d');
+
+  const lats = data.points.map(p => p.lat);
+  const lons = data.points.map(p => p.lon);
+  const latMin = Math.min(...lats), latMax = Math.max(...lats);
+  const lonMin = Math.min(...lons), lonMax = Math.max(...lons);
+
+  // Calculer les valeurs de neige pour tous les points
+  const pts = data.points.map(pt => ({
+    cx: ((pt.lon - lonMin) / (lonMax - lonMin)) * W,
+    cy: ((latMax - pt.lat) / (latMax - latMin)) * H,
+    snow: interpolateSnow(pt) ?? 0,
+  }));
+
+  // Échelle dynamique : min/max réels (ignorer les 0 pour le min)
+  const snowVals = pts.map(p => p.snow).filter(v => v > 0);
+  const snowMin = snowVals.length > 0 ? Math.floor(Math.min(...snowVals)) : 0;
+  const snowMax = snowVals.length > 0 ? Math.ceil(Math.max(...snowVals))  : 100;
+
+  // Mettre à jour la légende avec les vraies valeurs
+  const gradLabels = document.querySelectorAll('.heatmap-grad-labels span');
+  if (gradLabels.length >= 2) {
+    gradLabels[0].textContent = snowMin + ' cm';
+    gradLabels[1].textContent = snowMax + ' cm';
+  }
+
+  // IDW sur grille W×H
+  const imgData = ctx.createImageData(W, H);
+  for (let py = 0; py < H; py++) {
+    for (let px = 0; px < W; px++) {
+      let wSum = 0, vSum = 0;
+      for (const p of pts) {
+        const d2 = (px - p.cx)**2 + (py - p.cy)**2;
+        if (d2 < 0.5) { wSum = 1; vSum = p.snow; break; }
+        const w = 1 / (d2 ** 1.5);
+        wSum += w; vSum += w * p.snow;
+      }
+      const snow = wSum > 0 ? vSum / wSum : 0;
+      const [r, g, b, a] = snowDepthColor(snow, snowMin, snowMax);
+      const idx = (py * W + px) * 4;
+      imgData.data[idx]   = r;
+      imgData.data[idx+1] = g;
+      imgData.data[idx+2] = b;
+      imgData.data[idx+3] = a;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // Supprimer l'overlay précédent
+  if (window._heatmapOverlay) {
+    map.removeLayer(window._heatmapOverlay);
+    window._heatmapOverlay = null;
+  }
+
+  // Ajouter comme ImageOverlay Leaflet (au-dessus des tuiles)
+  const bounds = [[latMin, lonMin], [latMax, lonMax]];
+  const dataURL = offscreen.toDataURL();
+  const opacitySlider = document.getElementById('heatmapOpacity');
+  const opacity = opacitySlider ? opacitySlider.value / 100 : 0.65;
+  window._heatmapOverlay = L.imageOverlay(dataURL, bounds, { opacity, zIndex: 400 }).addTo(map);
+}
+
+map.on('zoom', () => {
+  // L.imageOverlay se repositionne automatiquement, pas besoin de re-rendre
+});
+
+// ── BERA DETAIL ───────────────────────────────────────────────────────────────
+function renderBeraBlock(pt) {
+  const b = pt.bera;
+  if (!b) return '';
+  const elev = pt.elevation_m;
+  const isNorth = pt.aspect_deg <= 90 || pt.aspect_deg >= 270;
+  const snowEstim = interpolateSnow(pt, hour);
+
+  // Tableau enneigement
+  let tableRows = '';
+  if (b.enneigement_niveaux && b.enneigement_niveaux.length > 0) {
+    b.enneigement_niveaux.forEach(n => {
+      // Trouver le niveau le plus proche de l'altitude du point
+      const isHighlight = Math.abs(n.alti - elev) === Math.min(
+        ...b.enneigement_niveaux.map(x => Math.abs(x.alti - elev))
+      );
+      tableRows += `<tr class="${isHighlight ? 'highlight' : ''}">
+        <td>${n.alti} m</td>
+        <td>${n.N_cm ?? '—'} cm</td>
+        <td>${n.S_cm ?? '—'} cm</td>
+      </tr>`;
+    });
+  }
+
+  const limStr = isNorth
+    ? (b.limite_nord_m != null ? `Limite enneigement versant N : ${b.limite_nord_m} m` : '')
+    : (b.limite_sud_m  != null ? `Limite enneigement versant S : ${b.limite_sud_m} m`  : '');
+
+  return `
+    <div class="bera-block">
+      <div class="bera-title">
+        <span>BERA · ${b.bera_date ?? '—'}</span>
+        <span class="bera-massif">${b.massif_name ?? ''}</span>
+      </div>
+      <div class="bera-snow-bars">
+        <div class="bera-snow-item">
+          <div class="bera-snow-lbl">Neige au sol (estimée)</div>
+          <div class="bera-snow-val">${snowEstim != null ? Math.round(snowEstim) : '—'}<span class="bera-snow-unit"> cm</span></div>
+        </div>
+        <div class="bera-snow-item">
+          <div class="bera-snow-lbl">Fraîche 24h</div>
+          <div class="bera-snow-val">${b.bera_24h_cm != null ? Math.round(b.bera_24h_cm) : '—'}<span class="bera-snow-unit"> cm</span></div>
+        </div>
+        <div class="bera-snow-item">
+          <div class="bera-snow-lbl">Fraîche 72h</div>
+          <div class="bera-snow-val">${b.bera_72h_cm != null ? Math.round(b.bera_72h_cm) : '—'}<span class="bera-snow-unit"> cm</span></div>
+        </div>
+      </div>
+      ${tableRows ? `<table class="bera-table">
+        <thead><tr><th>Altitude</th><th>Nord</th><th>Sud</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>` : ''}
+      ${limStr ? `<div class="bera-limit">${limStr}</div>` : ''}
+    </div>`;
+}
+
+// ── SIDEBAR MOBILE ────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const txt = document.getElementById('sidebarHandleTxt');
+  const expanded = sb.classList.toggle('expanded');
+  txt.textContent = expanded ? '▾ Fermer' : 'Légende & Détail';
+}
+
+// Auto-expand sidebar sur mobile quand on clique un point
+function expandSidebarIfMobile() {
+  if (window.innerWidth <= 700) {
+    const sb = document.getElementById('sidebar');
+    if (!sb.classList.contains('expanded')) {
+      sb.classList.add('expanded');
+      document.getElementById('sidebarHandleTxt').textContent = '▾ Fermer';
+    }
+  }
+}
+
+// ── AVALANCHE ─────────────────────────────────────────────────────────────────
+let avalancheActive = false;
+let avalancheLayers = [];
+
+const AVAL_COLORS = {
+  1: { fill: '#FFFF00', label: 'Risque 1 — Faible' },
+  2: { fill: '#FFA500', label: 'Risque 2 — Limité' },
+  3: { fill: '#FF6600', label: 'Risque 3 — Marqué' },
+  4: { fill: '#FF0000', label: 'Risque 4 — Fort' },
+  5: { fill: '#990000', label: 'Risque 5 — Très fort' },
+};
+
+function clearAvalancheLayers() {
+  avalancheLayers.forEach(l => map.removeLayer(l));
+  avalancheLayers = [];
+}
+
+function toggleAvalanche() {
+  if (avalancheActive) {
+    avalancheActive = false;
+    document.getElementById('avalBtn').classList.remove('active');
+    clearAvalancheLayers();
+    document.getElementById('avalPanel').innerHTML =
+      '<div class="aval-empty">Cliquez sur ⚠ Avalanche pour afficher les zones.</div>';
+  } else {
+    fetchAvalanche();
+  }
+}
+
+async function fetchAvalanche() {
+  if (!bbox) return;
+  const base = document.getElementById('apiUrl').value.replace(/\/$/,'');
+  const bboxStr = `${bbox.lat_min},${bbox.lon_min},${bbox.lat_max},${bbox.lon_max}`;
+  const url = `${base}/avalanche?bbox=${encodeURIComponent(bboxStr)}&max_zones=300`;
+
+  const btn = document.getElementById('avalBtn');
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Calcul…';
+
+  document.getElementById('dot').className = 'dot loading';
+  document.getElementById('statusTxt').textContent = 'calcul avalanche…';
+
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const geojson = await r.json();
+
+    if (geojson.error) throw new Error(geojson.error);
+
+    clearAvalancheLayers();
+    renderAvalancheCones(geojson);
+
+    avalancheActive = true;
+    btn.classList.remove('loading');
+    btn.classList.add('active');
+    btn.textContent = '⚠ Avalanche';
+
+    document.getElementById('dot').className = 'dot ok';
+    const p = geojson.properties || {};
+    document.getElementById('statusTxt').textContent =
+      `Avalanche · ${p.n_cones || 0} cônes · ${p.massif_name || ''}`;
+
+    // Ouvrir le panneau sidebar
+    const sec = document.getElementById('sec-avalanche');
+    if (sec.classList.contains('collapsed')) sec.classList.remove('collapsed');
+    expandSidebarIfMobile();
+
+  } catch(e) {
+    btn.classList.remove('loading');
+    btn.textContent = '⚠ Avalanche';
+    document.getElementById('dot').className = 'dot err';
+    document.getElementById('statusTxt').textContent = 'Erreur avalanche : ' + e.message;
+    document.getElementById('avalPanel').innerHTML =
+      `<div class="aval-empty" style="color:var(--red)">Erreur : ${e.message}</div>`;
+  }
+}
+
+function renderAvalancheCones(geojson) {
+  const features = geojson.features || [];
+  const props    = geojson.properties || {};
+  const cones    = features.filter(f => f.properties.type === 'cone');
+
+  // Compter par risque
+  const counts = {};
+  cones.forEach(f => {
+    const r = f.properties.risque;
+    counts[r] = (counts[r] || 0) + 1;
+  });
+
+  // Dessiner les cônes — du risque le plus bas au plus haut (ordre d'affichage)
+  const sorted = [...cones].sort((a, b) => a.properties.risque - b.properties.risque);
+  sorted.forEach(f => {
+    const risque = f.properties.risque;
+    const col    = AVAL_COLORS[risque] || AVAL_COLORS[3];
+    const layer  = L.geoJSON(f, {
+      style: {
+        color:       col.fill,
+        weight:      1,
+        fillColor:   col.fill,
+        fillOpacity: 0.35,
+        opacity:     0.6,
+      },
+    });
+    layer.bindTooltip(
+      `<b>${col.label}</b><br>
+       Pente : ${f.properties.slope_deg}°<br>
+       Altitude : ${f.properties.elevation} m<br>
+       Longueur : ${f.properties.cone_length_m} m`,
+      { sticky: true, className: 'leaflet-tooltip' }
+    );
+    layer.addTo(map);
+    avalancheLayers.push(layer);
+  });
+
+  // Mettre à jour le panneau sidebar
+  const risquesPresents = Object.keys(counts).map(Number).sort();
+  const risqueBars = risquesPresents.map(r => {
+    const col = AVAL_COLORS[r] || AVAL_COLORS[3];
+    return `<div class="aval-risque-item">
+      <div class="aval-risque-swatch" style="background:${col.fill};border:1px solid rgba(0,0,0,.15)"></div>
+      <span>R${r} — ${counts[r]} zones</span>
+    </div>`;
+  }).join('');
+
+  const risquePrincipal = risquesPresents[risquesPresents.length - 1];
+  const colP = AVAL_COLORS[risquePrincipal] || AVAL_COLORS[3];
+
+  document.getElementById('avalPanel').innerHTML = `
+    <div class="aval-stats">
+      <strong>${props.massif_name || '—'}</strong><br>
+      Risque ${props.risque_bas}${props.risque_haut ? ' → ' + props.risque_haut : ''} · ${cones.length} zones identifiées
+    </div>
+    <div class="aval-risque-bar">${risqueBars}</div>
+    <div class="aval-stats" style="color:var(--muted);font-size:9px;line-height:1.6">
+      Les cônes représentent les trajectoires probables d'avalanche depuis les zones de départ
+      (pente > seuil BERA, exposition dangereuse). Simulation indicative — consulter le BERA officiel.
+    </div>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Empêcher Leaflet d'intercepter les clics sur la légende heatmap
+L.DomEvent.disableClickPropagation(document.getElementById('heatmapLegend'));
+L.DomEvent.disableScrollPropagation(document.getElementById('heatmapLegend'));
+buildLegend();
+document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+
+document.getElementById('slider').addEventListener('input', e => setHour(parseInt(e.target.value)));
+document.getElementById('btnCalc').addEventListener('click', calculate);
+document.getElementById('btnWindows').addEventListener('click', () => {
+  setMode(currentMode === 'poudre' ? 'moquette' : 'poudre');
+});
+document.getElementById('btnClear').addEventListener('click', clearAll);
+</script>
+</body>
+</html>

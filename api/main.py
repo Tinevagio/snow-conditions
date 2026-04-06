@@ -312,7 +312,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
     spring_hours = []
     for w in sorted(weather_series, key=lambda x: x.hour):
         cond, _ = classify_snow_condition(gp, w, month, day)
-        if cond.name == "SPRING_SNOW" and w.hour <= 15:  # pas après 14h
+        if cond.name == "SPRING_SNOW" and w.hour <= 14:  # pas après 14h
             spring_hours.append(w.hour)
 
     spring_optimal = None
@@ -327,7 +327,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
             else:
                 cur_start, cur_len = spring_hours[i], 1
         if best_len >= 1:
-            spring_optimal = best_start  # première heure de la meilleure fenêtre
+            spring_optimal = best_start + (best_len // 2)  # milieu de la meilleure fenêtre
 
     return {"powder_until_hour": powder_until, "spring_optimal_hour": spring_optimal}
 

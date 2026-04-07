@@ -252,9 +252,10 @@ def propagate_cone(zone: StartZone) -> AvalancheCone:
     length_m   = params["cone_length_m"]
     half_angle = params["cone_angle_deg"] / 2
 
-    # Direction de descente = aspect (Horn retourne directement la direction de descente)
-    # L'aspect IGN = direction vers laquelle regarde le versant = direction de descente
-    downslope = zone.aspect_deg % 360
+    # Direction de descente = aspect + 180° (vers le bas de la pente)
+    # Les .npz sont générés avec atan2(dz_dx, -dz_dy) qui inverse l'aspect,
+    # le +180° compense cette inversion → ne pas modifier sans regénérer les .npz
+    downslope = (zone.aspect_deg + 180) % 360
 
     # Apex du cône = zone de départ
     apex = (zone.lat, zone.lon)

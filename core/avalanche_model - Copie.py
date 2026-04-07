@@ -252,9 +252,8 @@ def propagate_cone(zone: StartZone) -> AvalancheCone:
     length_m   = params["cone_length_m"]
     half_angle = params["cone_angle_deg"] / 2
 
-    # Direction de descente = aspect (Horn retourne directement la direction de descente)
-    # L'aspect IGN = direction vers laquelle regarde le versant = direction de descente
-    downslope = zone.aspect_deg % 360
+    # Direction de descente = aspect + 180° (vers le bas de la pente)
+    downslope = (zone.aspect_deg + 180) % 360
 
     # Apex du cône = zone de départ
     apex = (zone.lat, zone.lon)
@@ -359,31 +358,10 @@ def to_geojson(
 # Point d'entrée principal
 # ---------------------------------------------------------------------------
 
-def _bera_info_from_dict(massif_id: int, d: dict) -> Optional[BERAInfo]:
-    """Construit un BERAInfo depuis le dict retourné par BeraCorrector.get_massif_info()."""
-    try:
-        risque_bas = d.get("risque_bas")
-        if risque_bas is None:
-            return None
-        return BERAInfo(
-            massif_id=massif_id,
-            massif_name=d.get("massif_name", ""),
-            risque_bas=int(risque_bas),
-            risque_haut=int(d["risque_haut"]) if d.get("risque_haut") else None,
-            risque_altitude_m=float(d["risque_altitude_m"]) if d.get("risque_altitude_m") else None,
-            limite_nord_m=float(d["limite_nord_m"]) if d.get("limite_nord_m") else None,
-            limite_sud_m=float(d["limite_sud_m"]) if d.get("limite_sud_m") else None,
-            pentes_dangereuses=d.get("pentes_dangereuses", {}),
-        )
-    except Exception:
-        return None
-
-
 def compute_avalanche_zones(
     massif_id: int,
     bbox: Optional[Tuple[float, float, float, float]] = None,
     max_zones: int = 300,
-    bera_data: Optional[dict] = None,
 ) -> Optional[dict]:
     """
     Calcule les zones d'avalanche pour un massif et une bbox optionnelle.
@@ -392,35 +370,28 @@ def compute_avalanche_zones(
         massif_id  : ID du massif (correspond au .npz)
         bbox       : (lat_min, lon_min, lat_max, lon_max) optionnel
         max_zones  : nombre max de zones de départ (perf)
-        bera_data  : dict brut depuis BeraCorrector.get_massif_info() (optionnel)
-                     Si fourni, évite de relire le fichier JSON local.
 
     Returns:
         GeoJSON dict ou None si données manquantes
     """
-    # 1. Charger grille
+    # 1. Charger grille et BERA
     grid = load_slope_grid(massif_id)
     if grid is None:
         return {"error": f"Grille pentes non disponible pour massif {massif_id}. "
                          f"Lancez scripts/build_slope_grids.py --massif {massif_id}"}
 
-    # 2. Charger BERA — depuis bera_data injecté ou depuis fichier local
-    if bera_data:
-        bera = _bera_info_from_dict(massif_id, bera_data)
-    else:
-        bera = load_bera(massif_id)
-
+    bera = load_bera(massif_id)
     if bera is None:
         return {"error": f"Données BERA non disponibles pour massif {massif_id}"}
 
-    # 3. Filtrer les zones de départ
+    # 2. Filtrer les zones de départ
     start_zones = find_start_zones(grid, bera, bbox=bbox, max_zones=max_zones)
 
     if not start_zones:
         return to_geojson([], [], bera)
 
-    # 4. Propager les cônes
+    # 3. Propager les cônes
     cones = [propagate_cone(z) for z in start_zones]
 
-    # 5. Export GeoJSON
+    # 4. Export GeoJSON
     return to_geojson(start_zones, cones, bera)

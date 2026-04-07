@@ -679,6 +679,7 @@ def get_avalanche(
         massif_id=massif_id,
         bbox=(lat_min, lon_min, lat_max, lon_max),
         max_zones=max_zones,
+        bera_data=massif_info,  # injecter les données BERA déjà chargées
     )
 
     if result is None:

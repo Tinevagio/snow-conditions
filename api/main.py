@@ -537,7 +537,7 @@ def get_best_window(
 @app.get("/debug/point")
 def debug_point(lat: float, lon: float, date: str = None,
                 aspect: float = 0, elevation: float = 1500, slope: float = 15):
-    target_date  = parse_date(date)
+    target_date  = parse_date(date) if date else datetime.now(timezone.utc).date()
     weather_series = get_hourly_weather(lat, lon, target_date)
 
     result = []
@@ -574,7 +574,7 @@ def debug_point(lat: float, lon: float, date: str = None,
 @app.get("/debug/compare")
 def debug_compare(lat: float, lon: float, date: str = None,
                   elevation: float = 1500, slope: float = 15):
-    target_date    = parse_date(date)
+    target_date    = parse_date(date) if date else datetime.now(timezone.utc).date()
     weather_series = get_hourly_weather(lat, lon, target_date)
 
     result = []

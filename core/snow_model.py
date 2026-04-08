@@ -154,21 +154,23 @@ def compute_surface_temperature(point, weather, month, day):
         hour=weather.hour,
     )
     rad = effective_radiation(
-        hour_utc   = weather.hour,
-        lat        = point.lat,
-        lon        = point.lon,
-        month      = month,
-        day        = day,
-        aspect     = point.aspect,
-        slope      = point.slope,
-        altitude_m = point.elevation
+        hour_utc             = weather.hour,
+        lat                  = point.lat,
+        lon                  = point.lon,
+        month                = month,
+        day                  = day,
+        aspect               = point.aspect,
+        slope                = point.slope,
+        altitude_m           = point.elevation,
+        hours_above_zero_48h = weather.hours_above_zero_last_48h,
+        shortwave_observed   = weather.shortwave_radiation,
     )
 
     # Refroidissement radiatif nocturne :
     # La neige émet de l'infrarouge et se refroidit en dessous de l'air ambiant
-    # lors des nuits calmes (peu de vent, pas de nuages = pas de radiation solaire)
+    # lors des nuits calmes (peu de vent, pas de radiation solaire)
     if rad.temperature_correction == 0 and weather.wind_speed < 15:
-        radiative_cooling = -2.0  # neige ~2°C plus froide que l'air la nuit
+        radiative_cooling = -2.0
     else:
         radiative_cooling = 0.0
 

@@ -146,26 +146,69 @@ def diffuse_radiation_on_slope(direct_horizontal: float, slope: float,
     return round(diffuse_sky + diffuse_ground, 1)
 
 
-def solar_to_temperature_correction(total_radiation: float,
-                                     slope: float) -> float:
+def solar_to_temperature_correction(
+    total_radiation: float,
+    slope: float,
+    month: int = 1,
+    hours_above_zero_48h: int = 0,
+    shortwave_observed: float = None,
+    shortwave_theoretical: float = None,
+) -> float:
     """
-    Correction de temperature surface due au rayonnement solaire.
-    La neige absorbe ~20% du rayonnement (albedo ~0.8).
-    500 W/m2 absorbés (100 W/m2 nets) → +1°C en surface.
-    Plafond à 3°C (versant sud ensoleillé en altitude).
+    Correction de température surface due au rayonnement solaire.
+
+    Albédo dynamique :
+      - Neige fraîche hivernale : 0.75
+      - Neige printanière (mars-juin) : 0.55
+      - Neige transformée (h48 > 12h positives) : -0.10 supplémentaire
+        (grains ronds plus absorbants qu'au J+1 de beau temps)
+
+    Cloud factor :
+      - Si shortwave_observed et shortwave_theoretical fournis,
+        on pondère la correction par le ratio réel/théorique.
+        Évite de surestimer l'effet solaire par temps couvert.
     """
-    absorbed = total_radiation * 0.20   # albédo neige 0.8
-    base_correction = absorbed / 100.0  # 100 W/m2 absorbés → +1°C
-    return min(base_correction, 3.0)
+    # ── Albédo saisonnier ────────────────────────────────────────────────────
+    if month in (7, 8):
+        albedo = 0.50
+    elif 3 <= month <= 6:
+        albedo = 0.55
+    else:
+        albedo = 0.75
+
+    # ── Albédo dynamique : neige transformée absorbe plus ───────────────────
+    if hours_above_zero_48h > 12:
+        albedo = max(0.40, albedo - 0.10)  # plancher à 0.40 (névé très transformé)
+
+    cap = 3.5
+
+    # ── Calcul de base ───────────────────────────────────────────────────────
+    absorbed        = total_radiation * (1.0 - albedo)
+    base_correction = absorbed / 100.0
+
+    # ── Cloud factor : pondération par couverture nuageuse réelle ────────────
+    if (shortwave_observed is not None
+            and shortwave_theoretical is not None
+            and shortwave_theoretical > 10):
+        cloud_factor = min(1.0, shortwave_observed / shortwave_theoretical)
+        base_correction *= cloud_factor
+
+    return min(base_correction, cap)
 
 
 def effective_radiation(hour_utc: float, lat: float, lon: float,
                          month: int, day: int, aspect: float, slope: float,
                          altitude_m: float,
-                         albedo_snow: float = 0.8) -> RadiationResult:
+                         albedo_snow: float = 0.8,
+                         hours_above_zero_48h: int = 0,
+                         shortwave_observed: float = None) -> RadiationResult:
     """
     Calcul complet du rayonnement effectif sur un versant.
     Fonction principale appelee depuis snow_model.py.
+
+    Paramètres additionnels :
+      hours_above_zero_48h : pour albédo dynamique (neige transformée)
+      shortwave_observed   : W/m² mesuré par Open-Meteo (cloud factor)
     """
     doy     = day_of_year(month, day)
     sol_pos = solar_position(hour_utc, lat, lon, month, day)
@@ -176,22 +219,32 @@ def effective_radiation(hour_utc: float, lat: float, lon: float,
                                direct_radiation=0.0, diffuse_radiation=0.0,
                                total_radiation=0.0, temperature_correction=0.0)
 
-    inc_angle         = incidence_angle_on_slope(sol_pos, aspect, slope)
-    
-    # Dans effective_radiation(), après le calcul de inc_angle :
+    inc_angle = incidence_angle_on_slope(sol_pos, aspect, slope)
+
     if inc_angle >= 90.0:
         return RadiationResult(solar_position=sol_pos,
                                incidence_angle_deg=90.0,
                                direct_radiation=0.0, diffuse_radiation=0.0,
                                total_radiation=0.0, temperature_correction=0.0)
-                               
+
     I0                = extraterrestrial_radiation(doy)
     tau               = atmospheric_transmittance(sol_pos.elevation_deg, altitude_m)
     direct_horizontal = I0 * tau * _sin(sol_pos.elevation_deg)
-    direct_on_slope   = 0.0 if inc_angle >= 90.0 else I0 * tau * _cos(inc_angle)
+    direct_on_slope   = I0 * tau * _cos(inc_angle)
     diffuse           = diffuse_radiation_on_slope(direct_horizontal, slope, albedo_snow)
     total             = round(direct_on_slope + diffuse, 1)
-    temp_corr         = solar_to_temperature_correction(total, slope)
+
+    # Rayonnement horizontal théorique (ciel clair) pour le cloud factor
+    shortwave_theoretical = direct_horizontal
+
+    temp_corr = solar_to_temperature_correction(
+        total_radiation       = total,
+        slope                 = slope,
+        month                 = month,
+        hours_above_zero_48h  = hours_above_zero_48h,
+        shortwave_observed    = shortwave_observed,
+        shortwave_theoretical = shortwave_theoretical,
+    )
 
     return RadiationResult(solar_position=sol_pos,
                            incidence_angle_deg=round(inc_angle, 2),

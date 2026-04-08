@@ -151,12 +151,16 @@ def solar_to_temperature_correction(total_radiation: float,
     """
     Correction de temperature surface due au rayonnement solaire.
     La neige absorbe ~20% du rayonnement (albedo ~0.8).
-    500 W/m2 absorbés (100 W/m2 nets) → +1°C en surface.
-    Plafond à 3°C (versant sud ensoleillé en altitude).
+    100 W/m2 absorbes ~= +1C en surface.
     """
-    absorbed = total_radiation * 0.20   # albédo neige 0.8
-    base_correction = absorbed / 100.0  # 100 W/m2 absorbés → +1°C
-    return min(base_correction, 3.0)
+    absorbed = total_radiation * 0.20
+    #base_correction = absorbed / 100.0
+    #slope_bonus = 1.0 + (slope / 90.0) * 0.2
+    
+    base_correction = total_radiation / 150.0
+    slope_bonus = 1.0 + (slope / 90.0) * 0.2
+    
+    return min(base_correction * slope_bonus, 4.0)
 
 
 def effective_radiation(hour_utc: float, lat: float, lon: float,

@@ -18,16 +18,17 @@ from .solar_radiation import effective_radiation
 # PARAMÈTRE DE CALIBRATION GLOBAL
 # ---------------------------------------------------------------------------
 
-TEMP_BIAS: float = -3.0
+TEMP_BIAS: float = 0.0
 """
 Décalage de température (°C) appliqué à tous les seuils de classification.
 
     +1.0  → poudre plus accessible, moquette plus exigeante
     -1.0  → poudre plus rare, moquette plus facile
-    0.0   → comportement par défaut
+    0.0   → comportement par défaut (calibration physique correcte)
 
-Modifier uniquement ce paramètre pour recalibrer l'ensemble du modèle.
-Valeurs typiques à tester : -2.0, -1.5, -1.0, -0.5, 0.0, +0.5, +1.0, +1.5, +2.0
+La correction solaire est maintenant physiquement correcte (absorbed/100),
+donc TEMP_BIAS=0.0 est le point de départ naturel.
+Modifier uniquement ce paramètre pour affiner si nécessaire.
 """
 
 
@@ -230,11 +231,12 @@ def classify_snow_condition(
     # ------------------------------------------------------------------
     # RÈGLE 5 — NEIGE DE PRINTEMPS
     # Neige ancienne, surface positive, transformation en cours.
+    # Requiert un minimum de rayonnement direct (pas de moquette sous les nuages)
     # Bloquée si la neige a déjà trop chauffé (cycle humide irréversible)
     # ------------------------------------------------------------------
     if (THR_SPRING_LO <= temp_surface <= THR_SPRING_HI
             and fresh_snow < 10
-            and weather.direct_radiation > 50
+            and weather.direct_radiation > 100
             and weather.hours_above_zero_last_48h < 8):
         return SnowCondition.SPRING_SNOW, temp_surface
 

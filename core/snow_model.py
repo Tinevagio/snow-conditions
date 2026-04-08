@@ -18,17 +18,16 @@ from .solar_radiation import effective_radiation
 # PARAMÈTRE DE CALIBRATION GLOBAL
 # ---------------------------------------------------------------------------
 
-TEMP_BIAS: float = 0.5
+TEMP_BIAS: float = -3.0
 """
 Décalage de température (°C) appliqué à tous les seuils de classification.
 
     +1.0  → poudre plus accessible, moquette plus exigeante
     -1.0  → poudre plus rare, moquette plus facile
-    0.0   → comportement par défaut (calibration physique correcte)
+    0.0   → comportement par défaut
 
-La correction solaire est maintenant physiquement correcte (absorbed/100),
-donc TEMP_BIAS=0.0 est le point de départ naturel.
-Modifier uniquement ce paramètre pour affiner si nécessaire.
+Modifier uniquement ce paramètre pour recalibrer l'ensemble du modèle.
+Valeurs typiques à tester : -2.0, -1.5, -1.0, -0.5, 0.0, +0.5, +1.0, +1.5, +2.0
 """
 
 
@@ -131,13 +130,18 @@ class SnowResult:
 def adjust_temperature_for_elevation(
     temp_ref: float,
     elevation_point: float,
-    elevation_ref: float
+    elevation_ref: float,
+    hour: int = 12,
 ) -> float:
     """
-    Gradient thermique standard : -0.6°C par 100m de dénivelé.
+    Gradient thermique altitudinal.
+    Gradient standard : -0.6°C/100m en journée.
+    Gradient nocturne : -0.75°C/100m (inversion thermique nocturne).
     """
     delta_elevation = elevation_point - elevation_ref
-    return temp_ref - (delta_elevation * 0.006)
+    # Gradient plus fort la nuit : inversion thermique en conditions anticycloniques
+    gradient = 0.0075 if (hour <= 7 or hour >= 20) else 0.006
+    return temp_ref - (delta_elevation * gradient)
 
 
 
@@ -146,7 +150,8 @@ def compute_surface_temperature(point, weather, month, day):
     temp_corrected = adjust_temperature_for_elevation(
         weather.temperature_2m,
         point.elevation,
-        weather.reference_elevation
+        weather.reference_elevation,
+        hour=weather.hour,
     )
     rad = effective_radiation(
         hour_utc   = weather.hour,
@@ -158,7 +163,16 @@ def compute_surface_temperature(point, weather, month, day):
         slope      = point.slope,
         altitude_m = point.elevation
     )
-    return temp_corrected + rad.temperature_correction
+
+    # Refroidissement radiatif nocturne :
+    # La neige émet de l'infrarouge et se refroidit en dessous de l'air ambiant
+    # lors des nuits calmes (peu de vent, pas de nuages = pas de radiation solaire)
+    if rad.temperature_correction == 0 and weather.wind_speed < 15:
+        radiative_cooling = -2.0  # neige ~2°C plus froide que l'air la nuit
+    else:
+        radiative_cooling = 0.0
+
+    return temp_corrected + rad.temperature_correction + radiative_cooling
 
 # ---------------------------------------------------------------------------
 # RÈGLES PHYSIQUES — CLASSIFIEUR PRINCIPAL
@@ -207,12 +221,9 @@ def classify_snow_condition(
 
     # ------------------------------------------------------------------
     # RÈGLE 2 — NEIGE HUMIDE LOURDE
-    # L'inertie thermique de la neige empêche l'humidification avant 11h
-    # même si la température de surface est élevée
     # ------------------------------------------------------------------
     if (temp_surface > THR_WET_HIGH
-            and weather.hours_above_zero_last_48h >= 6
-            and weather.hour >= 11):
+            and weather.hours_above_zero_last_48h >= 6):
         return SnowCondition.WET_HEAVY, temp_surface
 
     # ------------------------------------------------------------------
@@ -234,12 +245,11 @@ def classify_snow_condition(
     # ------------------------------------------------------------------
     # RÈGLE 5 — NEIGE DE PRINTEMPS
     # Neige ancienne, surface positive, transformation en cours.
-    # Requiert un minimum de rayonnement direct (pas de moquette sous les nuages)
     # Bloquée si la neige a déjà trop chauffé (cycle humide irréversible)
     # ------------------------------------------------------------------
     if (THR_SPRING_LO <= temp_surface <= THR_SPRING_HI
             and fresh_snow < 10
-            and weather.direct_radiation > 100
+            and weather.direct_radiation > 50
             and weather.hours_above_zero_last_48h < 8):
         return SnowCondition.SPRING_SNOW, temp_surface
 

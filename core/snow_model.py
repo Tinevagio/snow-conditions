@@ -247,12 +247,16 @@ def classify_snow_condition(
     # ------------------------------------------------------------------
     # RÈGLE 5 — NEIGE DE PRINTEMPS
     # Neige ancienne, surface positive, transformation en cours.
-    # Bloquée si la neige a déjà trop chauffé (cycle humide irréversible)
+    # Bloquée si :
+    #   - neige déjà trop humidifiée (h48 >= 36 = canicule prolongée)
+    #   - après 13h : la neige est déjà trop transformée pour être moquette
+    #   - radiation trop faible (< 100 W/m²) : pas de moquette sous les nuages
     # ------------------------------------------------------------------
     if (THR_SPRING_LO <= temp_surface <= THR_SPRING_HI
             and fresh_snow < 10
-            and weather.direct_radiation > 50
-            and weather.hours_above_zero_last_48h < 8):
+            and weather.direct_radiation > 100
+            and weather.hours_above_zero_last_48h < 36
+            and weather.hour <= 13):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------

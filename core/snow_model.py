@@ -18,7 +18,7 @@ from .solar_radiation import effective_radiation
 # PARAMÈTRE DE CALIBRATION GLOBAL
 # ---------------------------------------------------------------------------
 
-TEMP_BIAS: float = 0.0
+TEMP_BIAS: float = -2.0
 """
 Décalage de température (°C) appliqué à tous les seuils de classification.
 

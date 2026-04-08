@@ -223,9 +223,12 @@ def classify_snow_condition(
 
     # ------------------------------------------------------------------
     # RÈGLE 2 — NEIGE HUMIDE LOURDE
+    # Inertie thermique : la neige ne peut pas être détrempée avant 10h
+    # même si la température de surface est élevée
     # ------------------------------------------------------------------
     if (temp_surface > THR_WET_HIGH
-            and weather.hours_above_zero_last_48h >= 6):
+            and weather.hours_above_zero_last_48h >= 6
+            and weather.hour >= 10):
         return SnowCondition.WET_HEAVY, temp_surface
 
     # ------------------------------------------------------------------
@@ -249,6 +252,7 @@ def classify_snow_condition(
     # Neige ancienne, surface positive, transformation en cours.
     # Bloquée si :
     #   - neige déjà trop humidifiée (h48 >= 36 = canicule prolongée)
+    #   - avant 8h : neige pas encore assez réchauffée par le soleil
     #   - après 13h : la neige est déjà trop transformée pour être moquette
     #   - radiation trop faible (< 100 W/m²) : pas de moquette sous les nuages
     # ------------------------------------------------------------------
@@ -256,7 +260,7 @@ def classify_snow_condition(
             and fresh_snow < 10
             and weather.direct_radiation > 100
             and weather.hours_above_zero_last_48h < 36
-            and weather.hour <= 13):
+            and 8 <= weather.hour <= 13):
         return SnowCondition.SPRING_SNOW, temp_surface
 
     # ------------------------------------------------------------------

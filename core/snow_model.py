@@ -18,7 +18,7 @@ from .solar_radiation import effective_radiation
 # PARAMÈTRE DE CALIBRATION GLOBAL
 # ---------------------------------------------------------------------------
 
-TEMP_BIAS: float = -2.0
+TEMP_BIAS: float = 0.5
 """
 Décalage de température (°C) appliqué à tous les seuils de classification.
 
@@ -207,9 +207,12 @@ def classify_snow_condition(
 
     # ------------------------------------------------------------------
     # RÈGLE 2 — NEIGE HUMIDE LOURDE
+    # L'inertie thermique de la neige empêche l'humidification avant 11h
+    # même si la température de surface est élevée
     # ------------------------------------------------------------------
     if (temp_surface > THR_WET_HIGH
-            and weather.hours_above_zero_last_48h >= 6):
+            and weather.hours_above_zero_last_48h >= 6
+            and weather.hour >= 11):
         return SnowCondition.WET_HEAVY, temp_surface
 
     # ------------------------------------------------------------------

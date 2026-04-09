@@ -1332,8 +1332,8 @@ function renderDetail() {
   const tMin = Math.min(...pt.hours.map(h => h.temp_surface));
   const tMax = Math.max(...pt.hours.map(h => h.temp_surface));
   const tRange = tMax - tMin || 1;
-  const aspNames = {0:'Nord',45:'Nord-Est',90:'Est',135:'Sud-Est',
-                    180:'Sud',225:'Sud-Ouest',270:'Ouest',315:'Nord-Ouest'};
+  const aspNames = {0:'Nord',45:'Nord-Ouest',90:'Ouest',135:'Sud-Ouest',
+                    180:'Sud',225:'Sud-Est',270:'Est',315:'Nord-Est'};
   const aspLabel = aspNames[Math.round((pt.aspect_deg||0)/45)*45] || pt.aspect_label || '—';
 
   document.getElementById('detail').innerHTML = `

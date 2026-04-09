@@ -276,6 +276,9 @@ def classify_snow_condition(
     elif temp_surface <= 2 and weather.hours_above_zero_last_48h >= 6:
         # Soirée après journée chaude : pas de moquette, vieille neige
         return SnowCondition.OLD_PACKED, temp_surface
+    elif weather.hour < 10:
+        # Avant 10h, une temp positive mais sans soleil suffisant = encore gelé en profondeur
+        return SnowCondition.OLD_PACKED, temp_surface
     else:
         return SnowCondition.WET_HEAVY, temp_surface
 

@@ -46,14 +46,23 @@ def fetch_raw(lat: float, lon: float) -> dict:
         "timezone": "UTC",
     }
     url = OPENMETEO_BASE_URL + "?" + urllib.parse.urlencode(params)
-    try:
-        with urllib.request.urlopen(url, timeout=10) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.URLError as e:
-        raise RuntimeError(f"Open-Meteo inaccessible : {e}") from e
-    if "error" in data:
-        raise RuntimeError(f"Open-Meteo erreur : {data.get('reason')}")
-    return data
+
+    last_error = None
+    for attempt in range(3):  # 3 tentatives
+        try:
+            with urllib.request.urlopen(url, timeout=30) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if "error" in data:
+                raise RuntimeError(f"Open-Meteo erreur : {data.get('reason')}")
+            return data
+        except urllib.error.URLError as e:
+            last_error = e
+            if attempt < 2:
+                import time
+                time.sleep(2)  # attendre 2s avant retry
+            continue
+
+    raise RuntimeError(f"Open-Meteo inaccessible après 3 tentatives : {last_error}") from last_error
 
 
 def _safe(series, idx, default=0.0):

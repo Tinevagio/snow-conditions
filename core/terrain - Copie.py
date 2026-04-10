@@ -17,7 +17,6 @@ Conventions :
 
 import math
 import json
-import time as _time
 import urllib.request
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -30,36 +29,6 @@ try:
     RASTERIO_AVAILABLE = True
 except ImportError:
     RASTERIO_AVAILABLE = False
-
-# ---------------------------------------------------------------------------
-# Cache terrain en mémoire
-# Les données IGN (altitude, pente, exposition) ne changent jamais →
-# cache longue durée (24h) parfaitement justifié.
-# Clé : bbox arrondie à 3 décimales + résolution
-# ---------------------------------------------------------------------------
-
-_terrain_cache: dict = {}
-TERRAIN_CACHE_TTL = 24 * 3600  # 24 heures
-
-
-def _terrain_cache_key(lat_min, lon_min, lat_max, lon_max, resolution_m) -> str:
-    return f"{round(lat_min,3)},{round(lon_min,3)},{round(lat_max,3)},{round(lon_max,3)},{resolution_m}"
-
-
-def _terrain_cache_get(key: str):
-    entry = _terrain_cache.get(key)
-    if entry and (_time.time() - entry["ts"]) < TERRAIN_CACHE_TTL:
-        return entry["data"]
-    return None
-
-
-def _terrain_cache_set(key: str, data):
-    _terrain_cache[key] = {"data": data, "ts": _time.time()}
-    # Nettoyer les entrées expirées
-    now = _time.time()
-    expired = [k for k, v in _terrain_cache.items() if now - v["ts"] > TERRAIN_CACHE_TTL]
-    for k in expired:
-        del _terrain_cache[k]
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -164,19 +133,14 @@ def _fetch_elevations_ign_chunk(locations: list) -> Optional[list]:
     lats = "|".join(str(p["latitude"])  for p in locations)
     url  = (f"{IGN_ALTI_URL}?lon={lons}&lat={lats}"
             f"&resource={IGN_ALTI_RESOURCE}&delimiter=|&zonly=true")
-    last_error = None
-    for attempt in range(3):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "snow-conditions/1.0"})
-            with urllib.request.urlopen(req, timeout=45) as resp:
-                data = json.loads(resp.read())
-            return [float(z) for z in data["elevations"]]
-        except Exception as e:
-            last_error = e
-            if attempt < 2:
-                _time.sleep(2)
-    print(f"[terrain] IGN chunk erreur après 3 tentatives: {type(last_error).__name__}: {last_error}")
-    return None
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "snow-conditions/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+        return [float(z) for z in data["elevations"]]
+    except Exception as e:
+        print(f"[terrain] IGN chunk erreur: {type(e).__name__}: {e}")
+        return None
 
 
 def _fetch_elevations_ign(locations: list) -> Optional[list]:
@@ -287,13 +251,6 @@ def get_terrain_grid(
 ) -> List[TerrainPoint]:
     import numpy as np
 
-    # ── Cache terrain (données IGN immuables → 24h) ──────────────────────────
-    cache_key = _terrain_cache_key(lat_min, lon_min, lat_max, lon_max, resolution_m)
-    cached = _terrain_cache_get(cache_key)
-    if cached is not None:
-        print(f"[terrain] cache HIT — {len(cached)} points")
-        return cached
-
     pad_lat = padding_m / 111_000
     pad_lon = padding_m / (111_000 * math.cos(math.radians((lat_min + lat_max) / 2)))
     lat_min_ext = lat_min - pad_lat
@@ -364,8 +321,6 @@ def get_terrain_grid(
             is_padding=is_padding
         ))
 
-    # ── Mettre en cache ──────────────────────────────────────────────────────
-    _terrain_cache_set(cache_key, points)
     return points
 
 

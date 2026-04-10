@@ -35,8 +35,44 @@ VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation","direct_ra
 PAST_DAYS = 15
 FORECAST_DAYS = 8
 
+# ---------------------------------------------------------------------------
+# Cache en mémoire — évite les appels répétés depuis l'IP Render
+# Clé : (lat_arrondi, lon_arrondi) — valide 45 min
+# ---------------------------------------------------------------------------
+import time as _time
+
+_cache: dict = {}          # {cache_key: {"data": ..., "ts": timestamp}}
+CACHE_TTL = 45 * 60        # 45 minutes en secondes
+
+
+def _cache_key(lat: float, lon: float) -> str:
+    return f"{round(lat, 2)},{round(lon, 2)}"
+
+
+def _cache_get(lat: float, lon: float):
+    key = _cache_key(lat, lon)
+    entry = _cache.get(key)
+    if entry and (_time.time() - entry["ts"]) < CACHE_TTL:
+        return entry["data"]
+    return None
+
+
+def _cache_set(lat: float, lon: float, data: dict):
+    key = _cache_key(lat, lon)
+    _cache[key] = {"data": data, "ts": _time.time()}
+    # Nettoyer les entrées expirées (évite la croissance infinie)
+    now = _time.time()
+    expired = [k for k, v in _cache.items() if now - v["ts"] > CACHE_TTL]
+    for k in expired:
+        del _cache[k]
+
 
 def fetch_raw(lat: float, lon: float) -> dict:
+    # ── Vérifier le cache ────────────────────────────────────────────────────
+    cached = _cache_get(lat, lon)
+    if cached is not None:
+        return cached
+
     params = {
         "latitude": lat, "longitude": lon,
         "hourly": ",".join(VARIABLES),
@@ -48,21 +84,35 @@ def fetch_raw(lat: float, lon: float) -> dict:
     url = OPENMETEO_BASE_URL + "?" + urllib.parse.urlencode(params)
 
     last_error = None
-    for attempt in range(3):  # 3 tentatives
+    for attempt in range(3):
         try:
             with urllib.request.urlopen(url, timeout=30) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             if "error" in data:
                 raise RuntimeError(f"Open-Meteo erreur : {data.get('reason')}")
+            # ── Mettre en cache ──────────────────────────────────────────────
+            _cache_set(lat, lon, data)
             return data
+        except urllib.error.HTTPError as e:
+            code = e.code
+            last_error = e
+            if code == 429:
+                raise RuntimeError(
+                    f"Open-Meteo rate limit (429) — IP Render bloquée. "
+                    f"Réessayez dans quelques minutes."
+                ) from e
+            if attempt < 2:
+                _time.sleep(2)
         except urllib.error.URLError as e:
             last_error = e
+            reason = getattr(e, 'reason', str(e))
             if attempt < 2:
-                import time
-                time.sleep(2)  # attendre 2s avant retry
+                _time.sleep(2)
             continue
 
-    raise RuntimeError(f"Open-Meteo inaccessible après 3 tentatives : {last_error}") from last_error
+    raise RuntimeError(
+        f"Open-Meteo inaccessible après 3 tentatives : {last_error}"
+    ) from last_error
 
 
 def _safe(series, idx, default=0.0):

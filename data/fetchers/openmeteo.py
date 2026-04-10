@@ -111,8 +111,9 @@ def _nearest_point(df, lat: float, lon: float):
 def _parquet_to_raw(rows, lat: float, lon: float) -> dict:
     """Convertit les lignes parquet au format dict attendu par get_hourly_weather."""
     rows = rows.sort_values("time")
+    elev = float(rows["elevation"].iloc[0]) if "elevation" in rows.columns else 0.0
     return {
-        "elevation": 0.0,
+        "elevation": elev,
         "hourly": {
             "time":                [t.strftime("%Y-%m-%dT%H:%M") for t in rows["time"]],
             "temperature_2m":      rows["temperature_2m"].tolist(),

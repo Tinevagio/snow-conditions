@@ -321,7 +321,7 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
     spring_hours = []
     for w in sorted(weather_series, key=lambda x: x.hour):
         cond, _ = classify_snow_condition(gp, w, month, day)
-        if cond.name == "SPRING_SNOW" and w.hour <= 20:
+        if cond.name == "SPRING_SNOW" and w.hour <= 14:  # pas après 14h
             spring_hours.append(w.hour)
 
     spring_optimal = None
@@ -335,8 +335,8 @@ def _compute_windows(point: TerrainPoint, weather_series: list, month: int, day:
                     best_start, best_len = cur_start, cur_len
             else:
                 cur_start, cur_len = spring_hours[i], 1
-        if best_len >= 2:
-            spring_optimal = best_start + best_len // 2
+        if best_len >= 1:
+            spring_optimal = best_start + (best_len // 2)  # milieu de la meilleure fenêtre
 
     return {"powder_until_hour": powder_until, "spring_optimal_hour": spring_optimal}
 
@@ -537,7 +537,7 @@ def get_best_window(
 @app.get("/debug/point")
 def debug_point(lat: float, lon: float, date: str = None,
                 aspect: float = 0, elevation: float = 1500, slope: float = 15):
-    target_date  = parse_date(date)
+    target_date  = parse_date(date) if date else datetime.now(timezone.utc).date()
     weather_series = get_hourly_weather(lat, lon, target_date)
 
     result = []
@@ -574,7 +574,7 @@ def debug_point(lat: float, lon: float, date: str = None,
 @app.get("/debug/compare")
 def debug_compare(lat: float, lon: float, date: str = None,
                   elevation: float = 1500, slope: float = 15):
-    target_date    = parse_date(date)
+    target_date    = parse_date(date) if date else datetime.now(timezone.utc).date()
     weather_series = get_hourly_weather(lat, lon, target_date)
 
     result = []
@@ -623,7 +623,6 @@ def debug_bera(lat: float, lon: float):
         return {"error": "BeraCorrector non initialisé"}
     return _bera_corrector.get_massif_info(lat, lon)
 
-
 # ---------------------------------------------------------------------------
 # Endpoint avalanche
 # ---------------------------------------------------------------------------
@@ -658,7 +657,6 @@ def get_avalanche(
 
     lat_min, lon_min, lat_max, lon_max = _parse_bbox(bbox)
 
-    # Identifier le massif via le centre de la bbox
     center_lat = (lat_min + lat_max) / 2
     center_lon = (lon_min + lon_max) / 2
 
@@ -681,6 +679,7 @@ def get_avalanche(
         massif_id=massif_id,
         bbox=(lat_min, lon_min, lat_max, lon_max),
         max_zones=max_zones,
+        bera_data=massif_info,  # injecter les données BERA déjà chargées
     )
 
     if result is None:

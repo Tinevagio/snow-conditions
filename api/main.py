@@ -388,10 +388,10 @@ def get_conditions(
     # 2. Météo (centre bbox)
     center_lat = (lat_min + lat_max) / 2
     center_lon = (lon_min + lon_max) / 2
-    try:
-        weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
-    except RuntimeError as e:
-        raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
+
+
+
+
 
     if not weather:
         raise HTTPException(status_code=502, detail="Aucune donnée météo disponible.")

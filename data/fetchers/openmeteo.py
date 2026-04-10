@@ -31,12 +31,15 @@ except ImportError:
         direct_radiation:float
 
 OPENMETEO_BASE_URL = "https://api.open-meteo.com/v1/forecast"
-VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation","direct_radiation", "snowfall"]
+VARIABLES = ["temperature_2m", "windspeed_10m", "shortwave_radiation", "direct_radiation", "snowfall"]
 PAST_DAYS = 15
 FORECAST_DAYS = 8
 
+# URL du parquet pré-fetché par le cron GitHub Actions
+PARQUET_URL = "https://github.com/Tinevagio/Ski-touring-live/raw/main/data/meteo_cache.parquet"
+
 # ---------------------------------------------------------------------------
-# Cache en mémoire 45 min — réduit les appels depuis l'IP Render
+# Cache en mémoire 45 min
 # ---------------------------------------------------------------------------
 import time as _time
 
@@ -63,7 +66,83 @@ def _cache_set(lat: float, lon: float, data: dict):
         del _cache[k]
 
 
+# ---------------------------------------------------------------------------
+# Cache parquet global (rechargé toutes les 30 min)
+# ---------------------------------------------------------------------------
+_parquet_cache = {"df": None, "ts": 0.0}
+PARQUET_TTL = 30 * 60
+
+
+def _load_parquet():
+    """Charge le parquet depuis GitHub (cache 30 min)."""
+    now = _time.time()
+    if _parquet_cache["df"] is not None and now - _parquet_cache["ts"] < PARQUET_TTL:
+        return _parquet_cache["df"]
+    try:
+        import pandas as pd
+        import io
+        req = urllib.request.Request(
+            PARQUET_URL,
+            headers={"User-Agent": "snow-conditions/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = resp.read()
+        df = pd.read_parquet(io.BytesIO(data))
+        df["time"] = pd.to_datetime(df["time"], utc=True)
+        _parquet_cache["df"] = df
+        _parquet_cache["ts"] = now
+        print(f"[openmeteo] parquet chargé — {len(df)} lignes")
+        return df
+    except Exception as e:
+        print(f"[openmeteo] parquet erreur: {e}")
+        return None
+
+
+def _nearest_point(df, lat: float, lon: float):
+    """Retourne les données du point le plus proche dans le parquet."""
+    import numpy as np
+    pts = df[["latitude", "longitude"]].drop_duplicates()
+    dist = np.sqrt((pts["latitude"] - lat)**2 + (pts["longitude"] - lon)**2)
+    nearest = pts.iloc[dist.idxmin()]
+    return df[(df["latitude"] == nearest["latitude"]) &
+              (df["longitude"] == nearest["longitude"])].copy()
+
+
+def _parquet_to_raw(rows, lat: float, lon: float) -> dict:
+    """Convertit les lignes parquet au format dict attendu par get_hourly_weather."""
+    rows = rows.sort_values("time")
+    return {
+        "elevation": 0.0,
+        "hourly": {
+            "time":                [t.strftime("%Y-%m-%dT%H:%M") for t in rows["time"]],
+            "temperature_2m":      rows["temperature_2m"].tolist(),
+            "windspeed_10m":       rows["wind_speed_10m"].tolist(),
+            "shortwave_radiation": rows["shortwave_radiation"].fillna(0).tolist()
+                                   if "shortwave_radiation" in rows.columns else [0] * len(rows),
+            "direct_radiation":    rows["direct_radiation"].fillna(0).tolist()
+                                   if "direct_radiation" in rows.columns else [0] * len(rows),
+            "snowfall":            rows["snowfall"].tolist(),
+        }
+    }
+
+
 def fetch_raw(lat: float, lon: float) -> dict:
+    # 1. Cache mémoire
+    cached = _cache_get(lat, lon)
+    if cached is not None:
+        return cached
+
+    # 2. Parquet GitHub (priorité — évite le rate limit IP Render)
+    df = _load_parquet()
+    if df is not None:
+        rows = _nearest_point(df, lat, lon)
+        if not rows.empty:
+            data = _parquet_to_raw(rows, lat, lon)
+            _cache_set(lat, lon, data)
+            return data
+
+    # 3. Fallback API directe
+    print(f"[openmeteo] fallback API directe pour ({lat}, {lon})")
     params = {
         "latitude": lat, "longitude": lon,
         "hourly": ",".join(VARIABLES),
@@ -74,13 +153,8 @@ def fetch_raw(lat: float, lon: float) -> dict:
     }
     url = OPENMETEO_BASE_URL + "?" + urllib.parse.urlencode(params)
 
-    # ── Vérifier le cache ────────────────────────────────────────────────────
-    cached = _cache_get(lat, lon)
-    if cached is not None:
-        return cached
-
     last_error = None
-    for attempt in range(2):  # 2 tentatives max — évite dépassement timeout Render 30s
+    for attempt in range(2):
         try:
             with urllib.request.urlopen(url, timeout=10) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
@@ -91,9 +165,7 @@ def fetch_raw(lat: float, lon: float) -> dict:
         except urllib.error.HTTPError as e:
             last_error = e
             if e.code == 429:
-                raise RuntimeError(
-                    f"Open-Meteo rate limit (429) — IP Render bloquée."
-                ) from e
+                raise RuntimeError("Open-Meteo rate limit (429) — IP Render bloquée.") from e
             if attempt < 1:
                 import time; time.sleep(1)
         except urllib.error.URLError as e:
@@ -102,8 +174,6 @@ def fetch_raw(lat: float, lon: float) -> dict:
                 import time; time.sleep(1)
 
     raise RuntimeError(f"Open-Meteo inaccessible après 2 tentatives : {last_error}") from last_error
-
-
 def _safe(series, idx, default=0.0):
     if idx < 0 or idx >= len(series): return default
     val = series[idx]

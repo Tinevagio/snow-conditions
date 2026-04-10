@@ -101,7 +101,7 @@ def _load_parquet():
 def _nearest_point(df, lat: float, lon: float):
     """Retourne les données du point le plus proche dans le parquet."""
     import numpy as np
-    pts = df[["latitude", "longitude"]].drop_duplicates()
+    pts = df[["latitude", "longitude"]].drop_duplicates().reset_index(drop=True)
     dist = np.sqrt((pts["latitude"] - lat)**2 + (pts["longitude"] - lon)**2)
     nearest = pts.iloc[dist.idxmin()]
     return df[(df["latitude"] == nearest["latitude"]) &

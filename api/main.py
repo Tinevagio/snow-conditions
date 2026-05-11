@@ -391,11 +391,7 @@ def get_conditions(
     try:
         weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
     except RuntimeError as e:
-        print(f"[openmeteo] ERREUR /conditions: {e}")
         raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
-    except Exception as e:
-        print(f"[openmeteo] ERREUR inattendue /conditions: {type(e).__name__}: {e}")
-        raise HTTPException(status_code=502, detail=f"Open-Meteo erreur : {e}")
 
     if not weather:
         raise HTTPException(status_code=502, detail="Aucune donnée météo disponible.")
@@ -642,10 +638,17 @@ def get_avalanche(
         300, ge=10, le=1000,
         description="Nombre max de zones de départ (impact perf)",
     ),
+    risque_override: int = Query(
+        None, ge=1, le=5,
+        description="Forcer un niveau de risque 1-5 (par défaut : risque BERA du massif)",
+    ),
 ):
     """
     Calcule les zones de départ d'avalanche et les cônes de propagation
     pour la bbox donnée, selon le niveau BERA du massif concerné.
+
+    Paramètre optionnel risque_override : permet de simuler un risque différent
+    du risque BERA réel (utile pour visualiser l'évolution selon le risque).
 
     Retourne un GeoJSON FeatureCollection avec :
       - Points : zones de départ (pente > seuil BERA, exposition dangereuse)
@@ -679,11 +682,15 @@ def get_avalanche(
 
     massif_id = massif_info["massif_id"]
 
+    # Surcharger le risque si demandé
+    if risque_override is not None:
+        massif_info = {**massif_info, "risque_bas": risque_override, "risque_haut": None}
+
     result = compute_avalanche_zones(
         massif_id=massif_id,
         bbox=(lat_min, lon_min, lat_max, lon_max),
         max_zones=max_zones,
-        bera_data=massif_info,  # injecter les données BERA déjà chargées
+        bera_data=massif_info,
     )
 
     if result is None:

@@ -391,7 +391,11 @@ def get_conditions(
     try:
         weather = get_hourly_weather(center_lat, center_lon, target_date=target_dt.date())
     except RuntimeError as e:
+        print(f"[openmeteo] ERREUR /conditions: {e}")
         raise HTTPException(status_code=502, detail=f"Open-Meteo inaccessible : {e}")
+    except Exception as e:
+        print(f"[openmeteo] ERREUR inattendue /conditions: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=502, detail=f"Open-Meteo erreur : {e}")
 
     if not weather:
         raise HTTPException(status_code=502, detail="Aucune donnée météo disponible.")

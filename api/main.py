@@ -684,7 +684,13 @@ def get_avalanche(
 
     # Surcharger le risque si demandé
     if risque_override is not None:
-        massif_info = {**massif_info, "risque_bas": risque_override, "risque_haut": None}
+        massif_info = {
+            **massif_info,
+            "risque_bas":    risque_override,
+            "risque_haut":   None,
+            "limite_nord_m": 0,   # ignorer filtre altitude en mode simulation
+            "limite_sud_m":  0,
+        }
 
     result = compute_avalanche_zones(
         massif_id=massif_id,

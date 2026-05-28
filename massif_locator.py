@@ -27,9 +27,15 @@ GEO_OVERRIDES = [
     # Haute-Tarentaise — haute vallée de l'Isère (Val d'Isère, Tignes)
     # Vanoise OSM déborde sur cette zone
     (45.10, 45.38, 6.65, 7.05, 6),
-    # Haute-Tarentaise — Les Arcs, Bourg-St-Maurice, La Plagne
-    # Beaufortain et Vanoise OSM débordent sur cette zone
-    (45.45, 45.72, 6.35, 6.75, 6),
+    # Haute-Tarentaise — Les Arcs, Bourg-St-Maurice (haute vallée Isère, est)
+    # Beaufortain et Vanoise OSM débordent sur cette zone.
+    # NB : bbox resserrée vers l'est (lon ≥ 6.72) pour ne PAS mordre sur le
+    # cœur du Beaufortain (Cormet/Lac de Roselend, Arêches) qui était
+    # auparavant attribué à tort à la Haute-Tarentaise.
+    (45.45, 45.66, 6.72, 6.90, 6),
+    # Haute-Tarentaise — La Plagne (sud du massif)
+    # Bbox basse en latitude pour ne pas remonter sur Roselend/Beaufort.
+    (45.45, 45.56, 6.60, 6.75, 6),
     # Ubaye — vallée de l'Ubaye (Barcelonnette)
     # Mercantour OSM s'étend trop loin vers l'ouest
     (44.25, 44.52, 6.50, 7.00, 21),
@@ -39,6 +45,16 @@ GEO_OVERRIDES = [
     # Aure-Louron — Saint-Lary-Soulan et vallée d'Aure
     # Le polygone OSM id=67 est le Plantaurel (faux match) ; cet override corrige
     (42.68, 42.95, 0.22, 0.65, 67),
+    # Vanoise — massif de la Lauzière (basse Tarentaise, sous Albertville/Moûtiers)
+    # Le polygone OSM Belledonne (id=8) a une excroissance parasite qui remonte
+    # jusqu'ici (~57 km de son cœur), captant à tort cette zone. La Lauzière
+    # est géographiquement rattachée à la Vanoise → on force id=10.
+    (45.42, 45.58, 6.25, 6.45, 10),
+    # Beaufortain — nord du massif (Beaufort, Les Saisies, Hauteluce)
+    # Zone non couverte par les polygones OSM (trou autour du chef-lieu) :
+    # le fallback "bord le plus proche" l'attribuait à tort à l'Aravis
+    # (à 0.2 km près). On force id=5.
+    (45.68, 45.82, 6.45, 6.70, 5),
 ]
 
 # Corrections de centroïdes appliquées à la volée (surcharge le JSON)
@@ -204,10 +220,12 @@ if __name__ == "__main__":
         (45.35, 5.88,  "Chamrousse",          8,  "Belledonne"),
         (45.18, 6.72,  "Val-d-Isère",         6,  "Haute-Tarentaise"),
         (44.45, 6.85,  "Barcelonnette",       21, "Ubaye"),
-        (45.55, 6.35,  "Les Arcs",            6,  "Haute-Tarentaise"),
         (45.00, 5.75,  "Villard-de-Lans",     14, "Vercors"),
         (42.54, 2.10,  "Font-Romeu",          74, "Cerdagne-Canigou"),
         (45.48, 6.62,  "Bourg-St-Maurice",    6,  "Haute-Tarentaise"),
+        (45.55, 6.35,  "Lauziere",            10, "Vanoise"),
+        (45.721, 6.578, "Beaufort",           5,  "Beaufortain"),
+        (45.674, 6.687, "Cormet-Roselend",    5,  "Beaufortain"),
         (44.92, 6.30,  "La Grave",            15, "Oisans"),
         (45.10, 6.10,  "Alpe-d-Huez",         12, "Grandes-Rousses"),
         (45.39, 6.72,  "Pralognan",           10, "Vanoise"),

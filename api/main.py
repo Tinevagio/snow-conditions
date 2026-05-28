@@ -113,6 +113,42 @@ def _apply_bera(weather: list, terrain: TerrainPoint) -> list:
         return weather
 
 
+def _build_bera_info(terrain: TerrainPoint) -> Optional["BeraInfo"]:
+    """
+    Construit l'objet BeraInfo (massif, limites, enneigement par niveaux...)
+    pour un point terrain donné. Renvoie None si le corrector est indispo,
+    si le terrain est inconnu, ou en cas d'erreur.
+
+    Factorisé pour être utilisé à la fois par /conditions (grille) et
+    /conditions/point (point unique) — auparavant seul /conditions le
+    renseignait, ce qui faisait que le détail d'un point tapé sur la carte
+    n'avait jamais d'info BERA (bera=null), et donc pas d'épaisseur estimée
+    ni de détection "pas de neige" côté client.
+    """
+    if _bera_corrector is None or terrain is None:
+        return None
+    try:
+        raw = _bera_corrector.get_massif_info(terrain.lat, terrain.lon)
+        if not raw:
+            return None
+        niveaux = [
+            BeraSnowLevel(alti=n["alti"], N_cm=n.get("N_cm"), S_cm=n.get("S_cm"))
+            for n in raw.get("enneigement_niveaux", [])
+        ]
+        return BeraInfo(
+            massif_name=raw.get("massif_name"),
+            bera_date=raw.get("bera_date"),
+            limite_nord_m=raw.get("limite_nord_m"),
+            limite_sud_m=raw.get("limite_sud_m"),
+            bera_72h_cm=raw.get("bera_72h_cm"),
+            bera_24h_cm=raw.get("bera_24h_cm"),
+            enneigement_niveaux=niveaux,
+        )
+    except Exception as e:
+        logger.warning(f"_build_bera_info error ({terrain.lat},{terrain.lon}): {e}")
+        return None
+
+
 # ---------------------------------------------------------------------------
 # App
 # ---------------------------------------------------------------------------
@@ -268,26 +304,7 @@ def _group_results_by_point(
         hours_data = sorted(by_point.get(key, []), key=lambda r: r.hour)
 
         # ── Infos BERA pour ce point ──────────────────────────────────────────
-        bera_info = None
-        if _bera_corrector is not None and terrain is not None:
-            try:
-                raw = _bera_corrector.get_massif_info(terrain.lat, terrain.lon)
-                if raw:
-                    niveaux = [
-                        BeraSnowLevel(alti=n["alti"], N_cm=n.get("N_cm"), S_cm=n.get("S_cm"))
-                        for n in raw.get("enneigement_niveaux", [])
-                    ]
-                    bera_info = BeraInfo(
-                        massif_name=raw.get("massif_name"),
-                        bera_date=raw.get("bera_date"),
-                        limite_nord_m=raw.get("limite_nord_m"),
-                        limite_sud_m=raw.get("limite_sud_m"),
-                        bera_72h_cm=raw.get("bera_72h_cm"),
-                        bera_24h_cm=raw.get("bera_24h_cm"),
-                        enneigement_niveaux=niveaux,
-                    )
-            except Exception as e:
-                logger.warning(f"BeraInfo error ({gp.lat},{gp.lon}): {e}")
+        bera_info = _build_bera_info(terrain)
 
         output.append(PointConditions(
             lat=gp.lat,
@@ -467,6 +484,10 @@ def get_conditions_point(
     results   = compute_snow_conditions([gp], weather, target_dt.month, target_dt.day)
     hours_out = [_result_to_hourly(r) for r in sorted(results, key=lambda r: r.hour)]
 
+    # Infos BERA (massif, limites, enneigement par niveaux) — nécessaires
+    # côté client pour l'épaisseur estimée et la détection "pas de neige".
+    bera_info = _build_bera_info(terrain)
+
     return PointConditions(
         lat=lat,
         lon=lon,
@@ -474,6 +495,7 @@ def get_conditions_point(
         aspect_deg=terrain.aspect_deg,
         aspect_label=terrain.aspect_label(),
         slope_deg=terrain.slope_deg,
+        bera=bera_info,
         hours=hours_out,
     )
 

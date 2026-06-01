@@ -37,11 +37,18 @@ BERA_JSON_PATH   = DATA_DIR / "bera_enneigement.json"
 
 # Paramètres BERA → simulation avalanche
 BERA_PARAMS = {
-    1: {"slope_min": 35, "cone_length_m": 180,  "cone_angle_deg": 18},
-    2: {"slope_min": 32, "cone_length_m": 300,  "cone_angle_deg": 22},
-    3: {"slope_min": 29, "cone_length_m": 500,  "cone_angle_deg": 28},
-    4: {"slope_min": 25, "cone_length_m": 750,  "cone_angle_deg": 34},
-    5: {"slope_min": 20, "cone_length_m": 1000, "cone_angle_deg": 42},
+    # Calibration WhiteSilence v0.2 — longueurs réduites par rapport à la
+    # littérature SLF pour mieux coller au visuel utile en ski de rando
+    # (réduction asymétrique : plus forte sur risques bas, conservatrice sur
+    # risques hauts où il faut continuer à voir l'ampleur).
+    #
+    # Référence d'origine (SLF-inspired) :
+    #   1: 180, 2: 300, 3: 500, 4: 750, 5: 1000
+    1: {"slope_min": 35, "cone_length_m": 120, "cone_angle_deg": 18},
+    2: {"slope_min": 32, "cone_length_m": 220, "cone_angle_deg": 22},
+    3: {"slope_min": 29, "cone_length_m": 400, "cone_angle_deg": 28},
+    4: {"slope_min": 25, "cone_length_m": 650, "cone_angle_deg": 34},
+    5: {"slope_min": 20, "cone_length_m": 900, "cone_angle_deg": 42},
 }
 
 # Correspondance exposition texte → degrés (centre de secteur)

@@ -11,11 +11,17 @@ Modèle de simulation des zones d'avalanche.
 
 Paramètres BERA → simulation :
   Risque  Pente départ  Longueur cône  Angle ouverture
-    1       >35°          180m            18°
-    2       >32°          300m            22°
-    3       >29°          500m            28°
-    4       >25°          750m            34°
-    5       >20°         1000m            42°
+    1       >35°          120m            18°
+    2       >32°          220m            22°
+    3       >29°          400m            28°
+    4       >25°          650m            34°
+    5       >20°          900m            42°
+
+Comportement riskOverride :
+  Si riskOverride > risque BERA réel, le filtre exposition est désactivé :
+  on suppose que le danger s'est étendu à tous les versants. Seuls les
+  filtres pente et altitude restent actifs.
+  Si riskOverride <= risque réel, le filtre exposition BERA est conservé.
 """
 
 import json
@@ -35,15 +41,7 @@ DATA_DIR         = Path(__file__).parent.parent / "data"
 SLOPE_GRIDS_DIR  = DATA_DIR / "slope_grids"
 BERA_JSON_PATH   = DATA_DIR / "bera_enneigement.json"
 
-# Paramètres BERA → simulation avalanche
 BERA_PARAMS = {
-    # Calibration WhiteSilence v0.2 — longueurs réduites par rapport à la
-    # littérature SLF pour mieux coller au visuel utile en ski de rando
-    # (réduction asymétrique : plus forte sur risques bas, conservatrice sur
-    # risques hauts où il faut continuer à voir l'ampleur).
-    #
-    # Référence d'origine (SLF-inspired) :
-    #   1: 180, 2: 300, 3: 500, 4: 750, 5: 1000
     1: {"slope_min": 35, "cone_length_m": 120, "cone_angle_deg": 18},
     2: {"slope_min": 32, "cone_length_m": 220, "cone_angle_deg": 22},
     3: {"slope_min": 29, "cone_length_m": 400, "cone_angle_deg": 28},
@@ -51,13 +49,11 @@ BERA_PARAMS = {
     5: {"slope_min": 20, "cone_length_m": 900, "cone_angle_deg": 42},
 }
 
-# Correspondance exposition texte → degrés (centre de secteur)
 ASPECT_DEGREES = {
     "N":  0,   "NE": 45,  "E":  90,  "SE": 135,
     "S":  180, "SW": 225, "W":  270, "NW": 315,
 }
 
-# Tolérance angulaire pour la correspondance exposition (±demi-secteur)
 ASPECT_TOLERANCE_DEG = 25.0
 
 # ---------------------------------------------------------------------------
@@ -73,25 +69,22 @@ class BERAInfo:
     risque_altitude_m:  Optional[float]
     limite_nord_m:      Optional[float]
     limite_sud_m:       Optional[float]
-    pentes_dangereuses: Dict[str, bool]   # {"N": True, "NE": False, ...}
+    pentes_dangereuses: Dict[str, bool]
 
 @dataclass
 class StartZone:
-    """Cellule de départ d'avalanche."""
     lat:        float
     lon:        float
     elevation:  float
     slope_deg:  float
     aspect_deg: float
-    risque:     int    # niveau BERA applicable (bas ou haut selon altitude)
+    risque:     int
 
 @dataclass
 class AvalancheCone:
-    """Cône de propagation depuis une zone de départ."""
     start:          StartZone
     cone_length_m:  float
     cone_angle_deg: float
-    # Polygone GeoJSON du cône [lon, lat] (convention GeoJSON)
     polygon:        List[Tuple[float, float]]
 
 # ---------------------------------------------------------------------------
@@ -99,7 +92,6 @@ class AvalancheCone:
 # ---------------------------------------------------------------------------
 
 def load_slope_grid(massif_id: int) -> Optional[Dict[str, np.ndarray]]:
-    """Charge le .npz précalculé pour un massif."""
     path = SLOPE_GRIDS_DIR / f"{massif_id}.npz"
     if not path.exists():
         return None
@@ -114,17 +106,15 @@ def load_slope_grid(massif_id: int) -> Optional[Dict[str, np.ndarray]]:
 
 
 def load_bera(massif_id: int) -> Optional[BERAInfo]:
-    """Charge les données BERA pour un massif."""
     if not BERA_JSON_PATH.exists():
         return None
     with open(BERA_JSON_PATH) as f:
         data = json.load(f)
-
     for item in data:
         if item.get("id") == massif_id:
             risque_bas = item.get("risque_bas")
             if risque_bas is None:
-                return None  # pas de données risque
+                return None
             return BERAInfo(
                 massif_id=massif_id,
                 massif_name=item.get("massif", ""),
@@ -142,7 +132,6 @@ def load_bera(massif_id: int) -> Optional[BERAInfo]:
 # ---------------------------------------------------------------------------
 
 def aspect_is_dangerous(aspect_deg: float, pentes_dangereuses: Dict[str, bool]) -> bool:
-    """Vérifie si une exposition est dans les pentes dangereuses BERA."""
     for direction, dangerous in pentes_dangereuses.items():
         if not dangerous:
             continue
@@ -163,7 +152,6 @@ def meters_to_deg_lon(meters: float, lat: float) -> float:
 
 def destination_point(lat: float, lon: float,
                       bearing_deg: float, distance_m: float) -> Tuple[float, float]:
-    """Calcule le point destination depuis lat/lon, cap et distance."""
     dlat = meters_to_deg_lat(distance_m) * math.cos(math.radians(bearing_deg))
     dlon = meters_to_deg_lon(distance_m, lat) * math.sin(math.radians(bearing_deg))
     return lat + dlat, lon + dlon
@@ -177,19 +165,39 @@ def find_start_zones(
     bera: BERAInfo,
     bbox: Optional[Tuple[float, float, float, float]] = None,
     max_zones: int = 500,
+    risk_override: Optional[int] = None,
 ) -> List[StartZone]:
     """
-    Filtre les cellules de départ selon :
-      - bbox (si fournie)
-      - altitude > limite d'enneigement
-      - pente > seuil BERA
-      - exposition dangereuse selon BERA
+    Filtre les cellules de départ selon pente, altitude, exposition.
+
+    risk_override :
+      Si fourni ET supérieur au risque réel du massif, le filtre exposition
+      est désactivé — on suppose que le danger s'étend à tous les versants.
+      Si absent ou inférieur/égal au risque réel, le filtre exposition BERA
+      est appliqué normalement.
+
+      Logique : un risque simulé aggravé représente un scénario où les
+      conditions se sont dégradées sur l'ensemble du massif, pas seulement
+      sur les versants identifiés dans le bulletin réel.
     """
     lats    = grid["lat"]
     lons    = grid["lon"]
     elevs   = grid["elevation"]
     slopes  = grid["slope"]
     aspects = grid["aspect"]
+
+    # Risque "réel" maximal du massif pour comparaison avec l'override
+    real_max_risque = max(
+        bera.risque_bas,
+        bera.risque_haut if bera.risque_haut is not None else 0
+    )
+
+    # Si override > risque réel → on désactive le filtre exposition.
+    # Tous les versants deviennent éligibles (seuls pente et altitude filtrent).
+    ignore_aspect_filter = (
+        risk_override is not None
+        and risk_override > real_max_risque
+    )
 
     zones = []
 
@@ -205,10 +213,13 @@ def find_start_zones(
             if not (lat_min <= lat <= lat_max and lon_min <= lon <= lon_max):
                 continue
 
-        # Niveau de risque applicable selon altitude
-        if (bera.risque_haut is not None
-                and bera.risque_altitude_m is not None
-                and elev >= bera.risque_altitude_m):
+        # Niveau de risque applicable : override prioritaire, sinon logique
+        # altitude bas/haut BERA
+        if risk_override is not None:
+            risque = risk_override
+        elif (bera.risque_haut is not None
+              and bera.risque_altitude_m is not None
+              and elev >= bera.risque_altitude_m):
             risque = bera.risque_haut
         else:
             risque = bera.risque_bas
@@ -227,9 +238,10 @@ def find_start_zones(
         if slope < params["slope_min"]:
             continue
 
-        # Filtre exposition
-        if not aspect_is_dangerous(aspect, bera.pentes_dangereuses):
-            continue
+        # Filtre exposition — désactivé si override aggravé
+        if not ignore_aspect_filter:
+            if not aspect_is_dangerous(aspect, bera.pentes_dangereuses):
+                continue
 
         zones.append(StartZone(
             lat=lat, lon=lon, elevation=elev,
@@ -237,7 +249,6 @@ def find_start_zones(
             risque=risque,
         ))
 
-    # Si trop de zones, sous-échantillonner uniformément
     if len(zones) > max_zones:
         step = len(zones) // max_zones
         zones = zones[::step][:max_zones]
@@ -249,45 +260,23 @@ def find_start_zones(
 # ---------------------------------------------------------------------------
 
 def propagate_cone(zone: StartZone) -> AvalancheCone:
-    """
-    Calcule le polygone du cône d'avalanche depuis une zone de départ.
-
-    Le cône suit la direction de plus grande pente (aspect) vers le bas
-    (aspect + 180°), avec un angle d'ouverture latéral.
-    """
-    params = BERA_PARAMS[zone.risque]
+    params     = BERA_PARAMS[zone.risque]
     length_m   = params["cone_length_m"]
     half_angle = params["cone_angle_deg"] / 2
 
-    # Direction de descente = aspect + 180° (vers le bas de la pente)
+    # Direction de descente = aspect + 180°
     # Les .npz sont générés avec atan2(dz_dx, -dz_dy) qui inverse l'aspect,
     # le +180° compense cette inversion → ne pas modifier sans regénérer les .npz
     downslope = (zone.aspect_deg + 180) % 360
 
-    # Apex du cône = zone de départ
-    apex = (zone.lat, zone.lon)
-
-    # Point central du cône à distance length_m
-    tip_lat, tip_lon = destination_point(zone.lat, zone.lon, downslope, length_m)
-
-    # Bords gauche et droit du cône
-    left_bearing  = (downslope - half_angle) % 360
-    right_bearing = (downslope + half_angle) % 360
-
-    left_lat,  left_lon  = destination_point(zone.lat, zone.lon, left_bearing,  length_m)
-    right_lat, right_lon = destination_point(zone.lat, zone.lon, right_bearing, length_m)
-
-    # Arc du cône : interpoler N points sur l'arc entre gauche et droite
     n_arc = max(5, int(params["cone_angle_deg"] / 5))
     arc_points = []
     for k in range(n_arc + 1):
         t = k / n_arc
-        bearing = left_bearing + t * params["cone_angle_deg"]
-        bearing = bearing % 360
+        bearing = (downslope - half_angle + t * params["cone_angle_deg"]) % 360
         plat, plon = destination_point(zone.lat, zone.lon, bearing, length_m)
-        arc_points.append((plon, plat))  # GeoJSON: [lon, lat]
+        arc_points.append((plon, plat))
 
-    # Polygone fermé : apex → bord gauche → arc → bord droit → apex
     polygon = (
         [(zone.lon, zone.lat)]
         + arc_points
@@ -309,11 +298,10 @@ def to_geojson(
     start_zones: List[StartZone],
     cones: List[AvalancheCone],
     bera: BERAInfo,
+    risk_override: Optional[int] = None,
 ) -> dict:
-    """Construit le GeoJSON complet : zones de départ + cônes."""
     features = []
 
-    # Zones de départ → points
     for z in start_zones:
         features.append({
             "type": "Feature",
@@ -330,7 +318,6 @@ def to_geojson(
             },
         })
 
-    # Cônes → polygones
     for c in cones:
         features.append({
             "type": "Feature",
@@ -353,22 +340,26 @@ def to_geojson(
     return {
         "type": "FeatureCollection",
         "properties": {
-            "massif_id":   bera.massif_id,
-            "massif_name": bera.massif_name,
-            "risque_bas":  bera.risque_bas,
-            "risque_haut": bera.risque_haut,
-            "n_start_zones": len(start_zones),
-            "n_cones":       len(cones),
+            "massif_id":          bera.massif_id,
+            "massif_name":        bera.massif_name,
+            "risque_bas":         bera.risque_bas,
+            "risque_haut":        bera.risque_haut,
+            "risk_override":      risk_override,
+            "aspect_filter_active": risk_override is None or risk_override <= max(
+                bera.risque_bas,
+                bera.risque_haut if bera.risque_haut is not None else 0
+            ),
+            "n_start_zones":      len(start_zones),
+            "n_cones":            len(cones),
         },
         "features": features,
     }
 
 # ---------------------------------------------------------------------------
-# Point d'entrée principal
+# Helpers internes
 # ---------------------------------------------------------------------------
 
 def _bera_info_from_dict(massif_id: int, d: dict) -> Optional[BERAInfo]:
-    """Construit un BERAInfo depuis le dict retourné par BeraCorrector.get_massif_info()."""
     try:
         risque_bas = d.get("risque_bas")
         if risque_bas is None:
@@ -386,33 +377,33 @@ def _bera_info_from_dict(massif_id: int, d: dict) -> Optional[BERAInfo]:
     except Exception:
         return None
 
+# ---------------------------------------------------------------------------
+# Point d'entrée principal
+# ---------------------------------------------------------------------------
 
 def compute_avalanche_zones(
     massif_id: int,
     bbox: Optional[Tuple[float, float, float, float]] = None,
     max_zones: int = 300,
     bera_data: Optional[dict] = None,
+    risk_override: Optional[int] = None,
 ) -> Optional[dict]:
     """
     Calcule les zones d'avalanche pour un massif et une bbox optionnelle.
 
     Args:
-        massif_id  : ID du massif (correspond au .npz)
-        bbox       : (lat_min, lon_min, lat_max, lon_max) optionnel
-        max_zones  : nombre max de zones de départ (perf)
-        bera_data  : dict brut depuis BeraCorrector.get_massif_info() (optionnel)
-                     Si fourni, évite de relire le fichier JSON local.
-
-    Returns:
-        GeoJSON dict ou None si données manquantes
+        massif_id    : ID du massif (correspond au .npz)
+        bbox         : (lat_min, lon_min, lat_max, lon_max) optionnel
+        max_zones    : nombre max de zones de départ (perf)
+        bera_data    : dict brut depuis BeraCorrector (évite relecture JSON)
+        risk_override: niveau 1-5 simulé. Si > risque réel, désactive le
+                       filtre exposition pour couvrir tous les versants.
     """
-    # 1. Charger grille
     grid = load_slope_grid(massif_id)
     if grid is None:
         return {"error": f"Grille pentes non disponible pour massif {massif_id}. "
                          f"Lancez scripts/build_slope_grids.py --massif {massif_id}"}
 
-    # 2. Charger BERA — depuis bera_data injecté ou depuis fichier local
     if bera_data:
         bera = _bera_info_from_dict(massif_id, bera_data)
     else:
@@ -421,14 +412,16 @@ def compute_avalanche_zones(
     if bera is None:
         return {"error": f"Données BERA non disponibles pour massif {massif_id}"}
 
-    # 3. Filtrer les zones de départ
-    start_zones = find_start_zones(grid, bera, bbox=bbox, max_zones=max_zones)
+    start_zones = find_start_zones(
+        grid, bera,
+        bbox=bbox,
+        max_zones=max_zones,
+        risk_override=risk_override,
+    )
 
     if not start_zones:
-        return to_geojson([], [], bera)
+        return to_geojson([], [], bera, risk_override)
 
-    # 4. Propager les cônes
     cones = [propagate_cone(z) for z in start_zones]
 
-    # 5. Export GeoJSON
-    return to_geojson(start_zones, cones, bera)
+    return to_geojson(start_zones, cones, bera, risk_override)
